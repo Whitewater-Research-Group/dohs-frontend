@@ -1,12 +1,5 @@
-# DOHS-auth
+# dohs-auth
 
-## About
+CLONE THE REPO 
 
-You can learn more about us here [official site](https://info.whitewaterresearchgroup.com).
-
-This repository holds a composer-installable app starter.
-It has been built from the
-
-
-## Installation & updates
-
+HOW TO TEST THE API USING POSTMAN: https://www.postman.com/supply-cosmonaut-2263908/workspace/dohs-auth-team/documentation/35575938-95db4d37-11ad-4ce0-8461-80b782eb892d
