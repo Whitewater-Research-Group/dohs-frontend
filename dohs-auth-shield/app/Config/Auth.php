@@ -18,7 +18,7 @@ class Auth extends ShieldAuth
      * ////////////////////////////////////////////////////////////////////
      */
     public array $views = [
-        'login'                       => '\CodeIgniter\Shield\Views\login',
+        'login'                       => 'auth\dohs_login',
         'register'                    => '\CodeIgniter\Shield\Views\register',
         'forgotPassword'              => '\CodeIgniter\Shield\Views\forgot_password',
         'resetPassword'               => '\CodeIgniter\Shield\Views\reset_password',
@@ -43,7 +43,7 @@ class Auth extends ShieldAuth
      */
     public array $redirects = [
         'register' => '/',
-        'login'    => '/home',
+        'login'    => '/secure',
         'logout'   => 'login',
     ];
 
