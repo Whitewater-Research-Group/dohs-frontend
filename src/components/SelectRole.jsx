@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import hero from "../assets/register.jpg";
 import hero2 from "../assets/select1.png";
-import Navbar from "./Navbar";
+import Header from "./header";
 import SignInAs from "./sub/SignInAs";
 
 import Footer from "./Footer";
@@ -36,16 +36,16 @@ const SelectRole = () => {
 
   return (
     <>
-    <Navbar />
+    <Header />
      
 
-    <div className="flex flex-col items-center">
-      <div className="flex w-full max-w-6xl my-10 px-4 ">
-        <div className="hidden lg:block">
+    <div className="">
+      <div className="flex items-center justify-around h-full w-full max-w-6xl my-10 px-4 border-grey">
+        <div className="  w-1/2 h-full">
         <img
           src={hero2}
           alt="Woman with dog"
-          className="w-full md:w-2/3 max-w-full"
+          className="w-full md:w-full max-w-full hidden lg:block"
         />
         </div>
         <SignInAs/>

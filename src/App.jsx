@@ -3,8 +3,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SignUp from './components/Signup';
-import Login from './components/Login';
-import NonHealthLogin from './components/Login2';
+import Login from './components/Login-med';
+import NonHealthLogin from './components/Login-nonmed';
 import SelectRole from './components/SelectRole';
 import NonHealthDashboard from './components/NonHealthDashboard';
 

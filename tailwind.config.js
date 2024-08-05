@@ -12,8 +12,11 @@ module.exports = {
       'secondary': '#026979',
       'accent': '#1BA9B5',
       'yellow': '#f3b917bf',
-      'green': '#33a11778'
-      
+      'green': '#1BA9B5',
+      'teal': '#33A11778',
+      'grey': '#d9d9d956',
+      'red': '#ffbaba42',
+      'wine': '#d8000c'
     },
   },
   plugins: [],
