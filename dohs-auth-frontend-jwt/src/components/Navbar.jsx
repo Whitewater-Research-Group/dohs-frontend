@@ -1,61 +1,41 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import { FaBars, FaTimes } from 'react-icons/fa'; // Import icons from react-icons
 
 const Navbar = () => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false); // State to manage menu visibility
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const toggleMenu = () => setIsMenuOpen(!isMenuOpen); // Toggle menu visibility
+    const navLinkClass = (isActive, baseClasses) =>
+        `${baseClasses} ${isActive ? 'text-steelBlue font-semibold' : ''}`;
 
     return (
-        <nav className="bg-white text-black">
-            <div className="max-w-screen-xl mx-auto px-4 flex items-center justify-between">
-                <div className="flex items-center">
-                    <span className="text-2xl font-bold">DOHS</span>
-                </div>
-                <div className="hidden md:flex space-x-6">
-                    <Link to="/" className="hover:text-gray-400">Home</Link>
-                    <Link to="/about" className="hover:text-gray-400">About</Link>
-                    <Link to="/surveillance-data" className="hover:text-gray-400">Surveillance Data</Link>
-                    <Link to="/stakeholders" className="hover:text-gray-400">Stakeholders</Link>
-                    <Link to="/login" className="hover:text-gray-400">Login</Link>
-                </div>
-                <div className="hidden md:flex space-x-4">
-                    <a href="tel:000000000" className="text-secondary py-2 px-4">
-                        Call <span className="font-bold"> +234 800 000</span>
-                    </a>
-                    <Link to="/login" className="bg-secondary hover:bg-white hover:text-secondary hover:border-secondary text-white py-2 px-4 rounded">
-                        Consult Online
-                    </Link>
-                </div>
-                <button 
-                    className="md:hidden text-black focus:outline-none" 
-                    aria-label="Toggle menu" 
-                    onClick={toggleMenu}
+        <header className="bg-white shadow font-primary fixed top-0 left-0 w-full z-50">
+            <div className="container mx-auto p-6 flex flex-col md:flex-row justify-between items-center max-w-screen-xl sm:flex-row">
+                <h1 className="text-3xl font-bold text-darkCharcoal mb-4 md:mb-0">DOHS</h1>
+                
+                {/* Hamburger Icon */}
+                <button
+                    className="block md:hidden text-darkCharcoal focus:outline-none"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
-                    <svg 
-                        className="w-6 h-6" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24" 
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                    </svg>
+                    {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
                 </button>
+                
+                {/* Menu */}
+                <nav className={`md:flex ${isMenuOpen ? 'block' : 'hidden'}`}>
+                    <ul className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8">
+                        <li><NavLink to="/" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base")}>Home</NavLink></li>
+                        <li><NavLink to="/about" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base")}>About</NavLink></li>
+                        <li><a href="#surveillance" className="text-darkCharcoal text-base">Surveillance Data</a></li>
+                        <li><a href="#portal" className="text-darkCharcoal text-base">Stakeholder Portal</a></li>
+                        <li><a href="#login" className="text-darkCharcoal text-base">Login</a></li>
+                        <li><a href="#login" className="text-cyan text-base pl-0 md:pl-8">Call <span className='font-bold'>1800 425 3800 or</span></a></li>
+                        <li><a href="#contact" className="text-white text-base font-medium bg-turquoiseBlue rounded-full px-4 py-2">Consult Online</a></li>
+                    </ul>
+                </nav>
             </div>
-            {/* Mobile menu */}
-            <div className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'}`}>
-                <div className="px-2 pt-2 pb-3 space-y-1">
-                    <Link to="/" className="block px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white">Home</Link>
-                    <Link to="/about" className="block px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white">About</Link>
-                    <Link to="/surveillance-data" className="block px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white">Surveillance Data</Link>
-                    <Link to="/stakeholders" className="block px-3 py-2 text-gray-300 hover:bg-gray-700 hover:text-white">Stakeholders</Link>
-                    <a href="tel:000000000" className="block px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded">Call 000000000</a>
-                    <Link to="/login" className="block px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">Login</Link>
-                </div>
-            </div>
-        </nav>
+        </header>
     );
-};
+}
 
 export default Navbar;

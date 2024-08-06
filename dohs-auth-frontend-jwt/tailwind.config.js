@@ -1,20 +1,46 @@
-// tailwind.config.js
-module.exports = {
+/** @type {import('tailwindcss').Config} */
+export default {
   content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    colors: {
-      transparent: 'transparent',
-      current: 'currentColor',
-      'white': '#ffffff',
-      'black': '#121212',
-      'secondary': '#026979',
-      'accent': '#1BA9B5',
-      'yellow': '#f3b917bf',
-      'green': '#33a11778'
-      
+    extend: {
+      fontFamily: {
+        primary: ['Poppins', 'sans-serif'],
+        cursive: ['Aguafina Script', 'cursive'],
+        sans: ['DM Sans'],
+        sora: ['Sora'],
+        manrope: ['Manrope'],
+        rale: ['Raleway'],
+      },
+
+      colors: {
+        steelBlue: '#527C88',
+        whiteSteel: '#1BA9B5',
+        cyan: '#026979',
+        turquoiseBlue: '#1BA9B5',
+        teal: '#38A3A5',
+        darkCharcoal: '#121212',
+        darkCoal: '#161C2D',
+        blueGray: '#6C87AE',
+        'white': '#ffffff',
+        'black': '#121212',
+        'secondary': '#026979',
+        'accent': '#1BA9B5',
+        'yellow': '#f3b917bf',
+        'green': '#1BA9B5',
+        'teal': '#33A11778',
+        'grey': '#d9d9d956',
+        'red': '#ffbaba42',
+        'wine': '#d8000c',
+        'danger': '#FF0000',
+      },
     },
   },
-  plugins: [],
+ 
+  plugins: [
+  
+  ],
 }
+
