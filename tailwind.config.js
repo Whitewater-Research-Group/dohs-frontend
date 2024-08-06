@@ -21,20 +21,8 @@ module.exports = {
       'danger': '#FF0000'
     },
   },
-  variants: {
-    extend: {
-      backgroundColor: ['autofill'],
-      textColor: ['autofill'],
-      borderColor: ['autofill'],
-    },
-  },
+ 
   plugins: [
-    function ({ addVariant, e }) {
-      addVariant('autofill', ({ modifySelectors, separator }) => {
-        modifySelectors(({ className }) => {
-          return `.${e(`autofill${separator}${className}`)}:autofill`;
-        });
-      });
-    },
+  
   ],
 }
