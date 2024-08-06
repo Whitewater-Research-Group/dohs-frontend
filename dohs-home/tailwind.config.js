@@ -10,6 +10,7 @@ export default {
         primary: ['Poppins', 'sans-serif'],
         cursive: ['Aguafina Script', 'cursive'],
         sans: ['DM Sans'],
+        sora: ['Sora'],
       },
 
       colors: {
@@ -19,6 +20,7 @@ export default {
         turquoiseBlue: '#1BA9B5',
         darkCharcoal: '#121212',
         darkCoal: '#161C2D',
+        blueGray: '#6C87AE',
       },
     },
   },

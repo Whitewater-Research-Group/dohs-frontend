@@ -6,7 +6,7 @@ import Ratings from './components/Ratings';
 import Services from './components/Services';
 import WhyChooseUs from './components/WhyChooseUs';
 import QuickConsult from './components/QuickConsult';
-// import Articles from './components/Articles';
+import Articles from './components/Articles';
 // import Chat from './components/Chat';
 // import Newsletter from './components/Newsletter';
 // import Footer from './components/Footer';
@@ -22,8 +22,8 @@ function App() {
       <Services />
       <WhyChooseUs />
       <QuickConsult />
-      {/* <Articles />
-      <Chat />
+      <Articles />
+      {/* <Chat />
       <Newsletter />
       <Footer />  */}
     </div>

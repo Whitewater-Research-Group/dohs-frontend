@@ -80,7 +80,7 @@ const Services = () => {
                 </div>
 
                 <div className='mt-10 text-end'>
-                    <a href='#' className='text-steelBlue font-primary font-medium text-base underline'>View All</a>
+                    <a href='#' className='text-steelBlue font-primary font-medium text-base hover:underline'>View All</a>
                 </div>
 
             </div>
