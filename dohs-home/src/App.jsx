@@ -8,7 +8,7 @@ import WhyChooseUs from './components/WhyChooseUs';
 import QuickConsult from './components/QuickConsult';
 import Articles from './components/Articles';
 import Chat from './components/Chat';
-// import Newsletter from './components/Newsletter';
+import Newsletter from './components/Newsletter';
 // import Footer from './components/Footer';
 
 function App() {
@@ -24,8 +24,8 @@ function App() {
       <QuickConsult />
       <Articles />
       <Chat />
-      {/* <Newsletter />
-      <Footer />  */}
+      <Newsletter />
+      {/* <Footer />  */}
     </div>
   )
 }
