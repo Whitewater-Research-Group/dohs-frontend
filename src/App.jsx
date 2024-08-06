@@ -2,12 +2,14 @@
 // src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import SignUp from './components/Signup';
-import Login from './components/Login-med';
-import NonHealthLogin from './components/Login-nonmed';
-import SelectRole from './components/SelectRole';
-import NonHealthDashboard from './components/NonHealthDashboard';
-import HealthDashboard from './components/HealthDashboard';
+import SignUp from './pages/Signup';
+import Login from './pages/Login-med';
+import NonHealthLogin from './pages/Login-nonmed';
+import SelectRole from './pages/SelectRole';
+import NonHealthDashboard from './pages/NonHealthDashboard';
+import HealthDashboard from './pages/HealthDashboard';
+import Home from './pages/Home';
+import About from './pages/About';
 
 
 
@@ -29,6 +31,11 @@ function App() {
         <Route path="/login" element={<SelectRole />} />
         <Route path="/non-health-dashboard" element={<NonHealthDashboard />} />
         <Route path="/health-dashboard" element={<HealthDashboard />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+
+
+        
 
 
 
