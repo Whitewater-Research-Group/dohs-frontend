@@ -16,7 +16,8 @@ module.exports = {
       'teal': '#33A11778',
       'grey': '#d9d9d956',
       'red': '#ffbaba42',
-      'wine': '#d8000c'
+      'wine': '#d8000c',
+      'danger': '#FF0000'
     },
   },
   plugins: [],

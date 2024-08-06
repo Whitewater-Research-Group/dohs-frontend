@@ -7,6 +7,7 @@ import Login from './components/Login-med';
 import NonHealthLogin from './components/Login-nonmed';
 import SelectRole from './components/SelectRole';
 import NonHealthDashboard from './components/NonHealthDashboard';
+import HealthDashboard from './components/HealthDashboard';
 
 
 
@@ -27,6 +28,8 @@ function App() {
         <Route path="/non-health-login" element={<NonHealthLogin />} />
         <Route path="/login" element={<SelectRole />} />
         <Route path="/non-health-dashboard" element={<NonHealthDashboard />} />
+        <Route path="/health-dashboard" element={<HealthDashboard />} />
+
 
 
 
