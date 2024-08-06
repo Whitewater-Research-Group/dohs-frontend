@@ -14,6 +14,7 @@ export default {
 
       colors: {
         steelBlue: '#527C88',
+        whiteSteel: '#1BA9B5',
         cyan: '#026979',
         turquoiseBlue: '#1BA9B5',
         darkCharcoal: '#121212',

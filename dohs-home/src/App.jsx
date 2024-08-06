@@ -5,7 +5,7 @@ import Hero from './components/Hero';
 import Ratings from './components/Ratings';
 import Services from './components/Services';
 import WhyChooseUs from './components/WhyChooseUs';
-// import QuickConsult from './components/QuickConsult';
+import QuickConsult from './components/QuickConsult';
 // import Articles from './components/Articles';
 // import Chat from './components/Chat';
 // import Newsletter from './components/Newsletter';
@@ -21,8 +21,8 @@ function App() {
       <Ratings />
       <Services />
       <WhyChooseUs />
-      {/* <QuickConsult />
-      <Articles />
+      <QuickConsult />
+      {/* <Articles />
       <Chat />
       <Newsletter />
       <Footer />  */}
