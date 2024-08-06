@@ -7,7 +7,7 @@ import Services from './components/Services';
 import WhyChooseUs from './components/WhyChooseUs';
 import QuickConsult from './components/QuickConsult';
 import Articles from './components/Articles';
-// import Chat from './components/Chat';
+import Chat from './components/Chat';
 // import Newsletter from './components/Newsletter';
 // import Footer from './components/Footer';
 
@@ -23,8 +23,8 @@ function App() {
       <WhyChooseUs />
       <QuickConsult />
       <Articles />
-      {/* <Chat />
-      <Newsletter />
+      <Chat />
+      {/* <Newsletter />
       <Footer />  */}
     </div>
   )

@@ -11,6 +11,8 @@ export default {
         cursive: ['Aguafina Script', 'cursive'],
         sans: ['DM Sans'],
         sora: ['Sora'],
+        manrope: ['Manrope'],
+        rale: ['Raleway'],
       },
 
       colors: {
@@ -18,6 +20,7 @@ export default {
         whiteSteel: '#1BA9B5',
         cyan: '#026979',
         turquoiseBlue: '#1BA9B5',
+        teal: '#38A3A5',
         darkCharcoal: '#121212',
         darkCoal: '#161C2D',
         blueGray: '#6C87AE',
