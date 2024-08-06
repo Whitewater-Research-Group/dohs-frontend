@@ -3,23 +3,43 @@ import hero from "../assets/register2.png";
 import Header from "./header";
 import Footer from "./Footer";
 
+import axios from "axios";
+
 const SignUp = () => {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    firstname: "",
+    lastname: "",
     email: "",
     designation: "",
-    licenseNumber: "",
+    license_number: "",
     password: "",
     confirmPassword: "",
     location: "",
     terms: false,
   });
 
-  const [errors, setErrors] = useState({});
+  const [sentFormData, setSentFormData] = useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    designation: "",
+    license_number: "",
+    password: "",
+    location: "",
+  });
+
+
+  //frontend State Validation
+  const [errors, setErrors] = useState({});//Maros' State Validation
   const [isFormValid, setIsFormValid] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+
+  
+  //Backend  State Validation
+  const [error, setError] = useState(null); // Daniels State Validation
+  const [success, setSuccess] = useState(null); 
 
   // Regular expressions for validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -29,12 +49,12 @@ const SignUp = () => {
   const validateForm = () => {
     let formErrors = {};
 
-    if (!formData.firstName) formErrors.firstName = "* First name is required";
-    if (!formData.lastName) formErrors.lastName = "* Last name is required";
+    if (!formData.firstname) formErrors.firstName = "* First name is required";
+    if (!formData.lastname) formErrors.lastName = "* Last name is required";
     if (!formData.email || !emailRegex.test(formData.email))
       formErrors.email = "* Invalid email";
     if (!formData.designation) formErrors.designation = "* Designation is required";
-    if (formData.designation === "Medical Doctor" && !formData.licenseNumber)
+    if (formData.designation === "Medical Doctor" && !formData.license_number)
       formErrors.licenseNumber = "* License number is required for Medical Doctors";
     if (!formData.password || !passwordRegex.test(formData.password))
       formErrors.password =
@@ -67,7 +87,49 @@ const SignUp = () => {
     e.preventDefault();
     if (isFormValid) {
       // Handle form submission here, e.g., sending data to the backend
-      console.log("Form data:", formData);
+      console.log("Form data:", sentFormData);
+    } else{
+      setErrors("Form not valid")
+    }
+
+    try {
+      // Send data to the backend
+      const response = await axios.post(
+        "http://localhost:3001/api/auth/register",
+        formData
+      );
+
+      // Handle the response data
+      console.log("Response data:", response.data);
+
+      // Clear the form fields
+      setFormData({
+        firstname: "",
+        lastname: "",
+        email: "",
+        designation: "",
+        license_number: "",
+        password: "",
+        confirmPassword: "",
+        location: "",
+      });
+
+      // Redirect to the login page or display a success message
+
+      if (response.status === 200 || response.status === 201) {
+        setSuccess("User registered successfully");
+        // Redirect to the login page using window.location
+        window.location.href = "/login";
+      } else {
+        // Handle error response status
+        console.error("Registration failed. Status:", response.status);
+        setError("Registration failed. Status:", response.status);
+      }
+    } catch (error) {
+      // Handle any errors
+      console.error("There was a problem with the Axios operation:", error.response.data.msg);
+      setError(error.response.data.msg)
+      
     }
   };
 
@@ -108,11 +170,11 @@ const SignUp = () => {
                     First Name
                   </label>
                   <input
-                    id="firstName"
+                    id="firstname"
                     className="p-2 mb-1 border-2 border-secondary rounded-lg w-full text-secondary hover:border-green focus:border-green active:border-green focus:outline-none active:outline-none"
                     type="text"
-                    name="firstName"
-                    value={formData.firstName}
+                    name="firstname"
+                    value={formData.firstname}
                     onChange={handleChange}
                     placeholder="First Name"
                     required
@@ -126,11 +188,11 @@ const SignUp = () => {
                     Last Name
                   </label>
                   <input
-                    id="lastName"
+                    id="lastname"
                     className="p-2 mb-2 border-2 border-secondary rounded-lg w-full text-secondary hover:border-green focus:border-green active:border-green focus:outline-none active:outline-none"
                     type="text"
-                    name="lastName"
-                    value={formData.lastName}
+                    name="lastname"
+                    value={formData.lastname}
                     onChange={handleChange}
                     placeholder="Last Name"
                     required
@@ -188,11 +250,11 @@ const SignUp = () => {
                     License Number
                   </label>
                   <input
-                    id="licenseNumber"
+                    id="license_number"
                     className="p-2 mb-2 border-2 border-secondary rounded-lg w-full text-secondary hover:border-green focus:border-green active:border-green focus:outline-none active:outline-none"
                     type="text"
                     name="licenseNumber"
-                    value={formData.licenseNumber}
+                    value={formData.license_number}
                     onChange={handleChange}
                     placeholder="License Number"
                   />
@@ -291,7 +353,7 @@ const SignUp = () => {
               )}
 
               <button
-                className={`p-2 rounded-lg w-full ${
+                className={`p-2 rounded-lg text-white w-full ${
                   isFormValid ? "bg-secondary hover:bg-green" : "bg-grey"
                 }`}
                 type="submit"
@@ -299,6 +361,8 @@ const SignUp = () => {
               >
                 Sign up
               </button>
+              {success && <p className="text-black">{success}</p>}
+              {error && <p className="text-black text-center">{error}</p>}
               <p className="mt-4 text-center">
                 Already have an account?{" "}
                 <a href="/login" className="text-secondary">

@@ -3,7 +3,7 @@ import Footer from "./Footer";
 import Header from "./header";
 import axios from "axios";
 
-const NonHealthDashboard = () => {
+const HealthDashboard = () => {
  
   const handleLogout = async () => {
     try {
@@ -26,7 +26,7 @@ const NonHealthDashboard = () => {
         <main className="flex-grow container mx-auto p-4">
           <div className="bg-white shadow-md rounded-lg p-6">
             <h1 className="text-2xl font-bold text-gray-800 mb-4">
-              You are seeing this because you are registered as a Non-Health Worker
+              You are seeing this because you are registered as a Health Worker
             </h1>
 
             <button
@@ -44,4 +44,4 @@ const NonHealthDashboard = () => {
   );
 };
 
-export default NonHealthDashboard;
+export default HealthDashboard;

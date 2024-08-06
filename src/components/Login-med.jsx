@@ -3,18 +3,19 @@ import hero from "../assets/register.jpg";
 import hero2 from "../assets/login2.png";
 import Header from "./header";
 import Footer from "./Footer";
+import axios from "axios";
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    designation: "",
-    licenseNumber: "",
+   
+  
+    license_number: "",
     password: "",
-    confirmPassword: "",
-    location: "",
+   
   });
+
+  const [Error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // Handler for input changes
   const handleChange = (e) => {
@@ -25,11 +26,43 @@ const Login = () => {
     }));
   };
 
-  // Handler for form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here, e.g., sending data to the backend
-    console.log("Form data:", formData);
+    
+
+    try {
+
+
+      const loginEndpoint = "http://localhost:3001/api/auth/login/health-worker";
+
+      
+      const response = await axios.post(loginEndpoint, formData);
+
+      if (response.status >= 200 && response.status < 300 && response.data.token) {
+          localStorage.setItem('authToken', response.data.token);
+
+
+          setFormData({
+              license_number: "",
+              password: "",
+          });
+
+          setSuccess("User logged in successfully");
+
+          window.location.href = "/health-dashboard";
+      } else {
+          console.error("Unexpected response format:", response.data);
+          setError("No token received from the server.");
+      }
+
+
+    } catch (error) {
+
+      console.error("Login request failed:", error);
+        setError("Invalid License Number or Password");
+      
+    }
+   
   };
 
   return (
@@ -57,15 +90,15 @@ const Login = () => {
             
 
             <div className="flex flex-col mb-4 relative">
-            <label className=" text-gray-700 text-xs absolute -top-3 left-3 bg-white p-1 rounded" htmlFor="licenseNumber">
+            <label className=" text-gray-700 text-xs absolute -top-3 left-3 bg-white p-1 rounded" htmlFor="license_number">
                   License Number
                 </label>
                 <input
-                  id="licenseNumber"
+                  id="license_number"
                   className="p-2 mb-2 border-2 border-secondary rounded-lg w-full hover:border-green focus:border-green active:border-green focus:outline-none active:outline-none text-secondary"
                   type="text"
-                  name="licenseNumber"
-                  value={formData.licenseNumber}
+                  name="license_number"
+                  value={formData.license_number}
                   onChange={handleChange}
                   placeholder="License Number"
                   required
@@ -97,6 +130,11 @@ const Login = () => {
               
               <a className="mr-2" href="/reset"><p>Forgot Password?</p></a>
             </div>
+
+            {Error && <p className="text-danger text-center">{Error}</p>}
+              {success && (
+                <p className="text-secondary text-center">{success}</p>
+              )}
             <button
               className="p-2 bg-secondary text-white rounded-md hover:bg-green w-full"
               type="submit"
