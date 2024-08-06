@@ -1,6 +1,3 @@
-Certainly! Here’s a template for a `README.md` file to guide developers on how to clone the repo, work on the `dohs-auth-frontend-jwt` folder, and manage branches:
-
----
 
 # Developer Guide for DOHS Auth Frontend (JWT)
 
@@ -93,5 +90,3 @@ Welcome to the DOHS Auth Frontend project! This guide provides instructions for 
 
   Refer to the project’s architecture for detailed information on project structure, development guidelines, and other relevant details.
 
-
-Feel free to adjust any details according to your specific needs or repository configuration.
