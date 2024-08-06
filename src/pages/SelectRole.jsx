@@ -40,7 +40,7 @@ const SelectRole = () => {
      
 
     <div className="">
-      <div className="flex items-center justify-around h-full w-full max-w-6xl my-10 px-4 border-grey">
+      <div className="flex items-center justify-around h-full w-full max-w-6xl my-10 px-4 border-grey bg-white">
         <div className="  w-1/2 h-full">
         <img
           src={hero2}

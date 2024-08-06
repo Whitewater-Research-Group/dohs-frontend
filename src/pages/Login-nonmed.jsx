@@ -68,8 +68,8 @@ const NonHealthLogin = () => {
     <>
       <Navbar />
 
-      <div className="flex flex-col items-center mt-5">
-        <div className="flex w-full max-w-6xl my-10 px-4 ">
+      <div className="flex flex-col items-center mt-50">
+        <div className="flex w-full max-w-6xl mt-32 mb-10 px-4 ">
           <div className="hidden lg:block">
             <img
               src={hero2}

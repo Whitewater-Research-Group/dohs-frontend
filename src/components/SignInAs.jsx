@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 
 const SignInAs = () => {
   return (
-    <div className="flex flex-col items-start justify-center min-h-screen bg-gray-100 p-4 ">
+    <div className="flex flex-col items-start justify-center min-h-screen  p-4 ">
       <h1 className="text-2xl font-semibold text-center mb-6 text-secondary">Welcome back!</h1>
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md p-2 border-grey border-2">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md  border-grey border-2">
         <div className="flex flex-col space-y-4 gap-8 ">
           <p className="text-2xl font-medium text-center text-secondary self-start">Sign in as</p>
           <div className="flex justify-between w-full gap-2">
