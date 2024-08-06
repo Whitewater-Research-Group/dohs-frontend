@@ -1,32 +1,20 @@
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import Ratings from './components/Ratings';
-import Services from './components/Services';
-import WhyChooseUs from './components/WhyChooseUs';
-import QuickConsult from './components/QuickConsult';
-import Articles from './components/Articles';
-import Chat from './components/Chat';
-import Newsletter from './components/Newsletter';
-import Footer from './components/Footer';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Home from './pages/Home';
+import About from './pages/About';
+import './index.css';
 
 function App() {
 
 
   return (
-    <div className=''>
-      <Navbar />
-      <Hero />
-      <Ratings />
-      <Services />
-      <WhyChooseUs />
-      <QuickConsult />
-      <Articles />
-      <Chat />
-      <Newsletter />
-      <Footer />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+      </Routes>
+    </Router>
   )
 }
 
