@@ -9,7 +9,7 @@ import QuickConsult from './components/QuickConsult';
 import Articles from './components/Articles';
 import Chat from './components/Chat';
 import Newsletter from './components/Newsletter';
-// import Footer from './components/Footer';
+import Footer from './components/Footer';
 
 function App() {
 
@@ -25,7 +25,7 @@ function App() {
       <Articles />
       <Chat />
       <Newsletter />
-      {/* <Footer />  */}
+      <Footer />
     </div>
   )
 }
