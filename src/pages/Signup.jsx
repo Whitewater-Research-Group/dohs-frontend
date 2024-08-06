@@ -146,7 +146,7 @@ const SignUp = () => {
     <>
       <Navbar />
 
-      <div className="flex flex-col items-center mt-36">
+      <div className="flex flex-col items-center mt-32">
         <div className="flex w-full max-w-6xl my-10 px-4">
           <img
             src={hero}
