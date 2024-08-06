@@ -18,6 +18,8 @@ const SignUp = () => {
 
   const [errors, setErrors] = useState({});
   const [isFormValid, setIsFormValid] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Regular expressions for validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -67,6 +69,15 @@ const SignUp = () => {
       // Handle form submission here, e.g., sending data to the backend
       console.log("Form data:", formData);
     }
+  };
+
+  // Toggle password visibility
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   return (
@@ -198,13 +209,20 @@ const SignUp = () => {
                 <input
                   id="password"
                   className="p-2 mb-2 border-2 border-secondary rounded-lg w-full text-secondary hover:border-green focus:border-green active:border-green focus:outline-none active:outline-none"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Password"
                   required
                 />
+                <button
+                  type="button"
+                  className="absolute right-3 top-3 text-secondary"
+                  onClick={togglePasswordVisibility}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
               </div>
 
               <div className="flex-col mb-4 relative">
@@ -217,13 +235,20 @@ const SignUp = () => {
                 <input
                   id="confirmPassword"
                   className="p-2 mb-2 border-2 border-secondary rounded-lg w-full text-secondary hover:border-green focus:border-green active:border-green focus:outline-none active:outline-none"
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Confirm Password"
                   required
                 />
+                <button
+                  type="button"
+                  className="absolute right-3 top-3 text-secondary"
+                  onClick={toggleConfirmPasswordVisibility}
+                >
+                  {showConfirmPassword ? "Hide" : "Show"}
+                </button>
               </div>
 
               <div className="flex-col mb-4 relative">

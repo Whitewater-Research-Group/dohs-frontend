@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
+    "./index.html"
   ],
   theme: {
     colors: {
@@ -19,5 +20,20 @@ module.exports = {
       'wine': '#d8000c'
     },
   },
-  plugins: [],
+  variants: {
+    extend: {
+      backgroundColor: ['autofill'],
+      textColor: ['autofill'],
+      borderColor: ['autofill'],
+    },
+  },
+  plugins: [
+    function ({ addVariant, e }) {
+      addVariant('autofill', ({ modifySelectors, separator }) => {
+        modifySelectors(({ className }) => {
+          return `.${e(`autofill${separator}${className}`)}:autofill`;
+        });
+      });
+    },
+  ],
 }
