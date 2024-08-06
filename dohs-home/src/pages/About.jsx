@@ -3,8 +3,8 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Story from '../components/Story';
 import Problem from '../components/Problem';
-
-// import Footer from '../components/Footer';
+import Impact from '../components/Impact';
+import Footer from '../components/Footer';
 
 function About() {
 
@@ -14,6 +14,8 @@ function About() {
             <Navbar />
             <Story />
             <Problem />
+            <Impact />
+            <Footer />
         </div>
     )
 }
