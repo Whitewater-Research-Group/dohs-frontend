@@ -24,13 +24,14 @@ export default {
         darkCharcoal: '#121212',
         darkCoal: '#161C2D',
         blueGray: '#6C87AE',
+        grey_one: '#AFAFAF',
         'white': '#ffffff',
         'black': '#121212',
         'secondary': '#026979',
         'accent': '#1BA9B5',
         'yellow': '#f3b917bf',
         'green': '#1BA9B5',
-        'teal': '#33A11778',
+        'teal_one': '#33A11778',
         'grey': '#d9d9d956',
         'red': '#ffbaba42',
         'wine': '#d8000c',
@@ -38,9 +39,9 @@ export default {
       },
     },
   },
- 
+
   plugins: [
-  
+
   ],
 }
 
