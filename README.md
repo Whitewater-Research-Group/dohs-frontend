@@ -1,3 +1,10 @@
+# How to contribute to this project
+
+# How components should be structured
+
+# What frameworks are we using?
+
+
 
 # Developer Guide for DOHS Auth Frontend (JWT)
 
