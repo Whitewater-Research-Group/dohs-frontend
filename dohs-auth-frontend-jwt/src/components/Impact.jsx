@@ -19,7 +19,7 @@ const Impact = () => {
 
                 <div className='mt-20 font-sans text-darkCoal'>
                     <h2 className="text-3xl font-bold mb-4 text-left ml-40">Impact</h2>
-                    <p className="mb-8 mx-40 text-left leading-9">
+                    <p className="mb-8 mx-40 text-left leading-9 text-xl">
                         Intersectoral spillover threat-alert to community health, Prevention of outbreaks of zoonotic disease in animals and
                         people, Improvement in food safety and security, A robust alert system Reduction in anti-microbial resistant infections,
                         Improvement of human and animal health, Empowerment of frontline workers with supportive technologies Protection of
