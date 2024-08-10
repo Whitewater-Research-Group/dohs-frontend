@@ -27,8 +27,29 @@ const Navbar = () => {
                         <li><NavLink to="/" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base")}>Home</NavLink></li>
                         <li><NavLink to="/about" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base")}>About</NavLink></li>
                         <li><a href="#surveillance" className="text-darkCharcoal text-base">Surveillance Data</a></li>
+
+                        {/* todo: fix this submenu */}
+                        <li className="relative group">
+                            <NavLink to="/report-env-inc" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base")}>
+                                Report
+                            </NavLink>
+                            <ul className="absolute hidden group-hover:block bg-white shadow-lg rounded-md mt-2">
+                                <li>
+                                    <NavLink to="/report-env-inc" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base block px-4 py-2 hover:bg-gray-200")}>
+                                        Environmental Inclusiveness
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <NavLink to="/report-dis-cas" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base block px-4 py-2 hover:bg-gray-200")}>
+                                        Disease Cases
+                                    </NavLink>
+                                </li>
+                            </ul>
+                        </li>
+
+
                         <li><a href="#portal" className="text-darkCharcoal text-base">Stakeholder Portal</a></li>
-                        <li><a href="#login" className="text-darkCharcoal text-base">Login</a></li>
+                        <li><NavLink to="/login" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base")}>Login</NavLink></li>
                         <li><a href="#login" className="text-cyan text-base pl-0 md:pl-8">Call <span className='font-bold'>1800 425 3800 or</span></a></li>
                         <li><a href="#contact" className="text-white text-base font-medium bg-turquoiseBlue rounded-full px-4 py-2">Consult Online</a></li>
                     </ul>
