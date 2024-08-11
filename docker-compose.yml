@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: express-app
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=localhost
+      - DB_PORT=5432
+      - DB_USER=daniel
+      - DB_PASSWORD=danosat2022
+      - DB_NAME=dohs
+    depends_on:
+      - db
+    volumes:
+      - .:/usr/src/app
+    command: npm start
+
+  db:
+    image: postgres:13
+    container_name: postgres-db
+    ports:
+      - "5433:5433"
+    environment:
+      POSTGRES_USER: daniel
+      POSTGRES_PASSWORD: danosat2022
+      POSTGRES_DB: dohs
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:
