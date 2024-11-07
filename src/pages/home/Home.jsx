@@ -13,7 +13,7 @@ import Footer from '../../components/Footer'
 
 function Home() {
   return (
-    <div className=''>
+    <div className='flex flex-col items-center'>
       <Navbar />
       <Hero />
       <Ratings />

@@ -37,31 +37,33 @@ function Articles() {
     ];
 
     return (
-        <section className="py-12 bg-gray-50">
-            <div className="container mx-auto px-6">
-                <div className='flex'>
-                    <h2 className="text-3xl font-bold font-primary text-cyan mb-8"><span className='text-steelBlue'>OneHealth Healthcare</span><br /> Articles</h2>
-                    <div className='ml-80 '>
-                        <p className='text-blueGray text-base font-normal font-sora pl-52'>Healthcare helps people maintain good health and prevent illness.<br /> Regular check-ups, vaccinations, and screenings can catch health is.</p>
+        <section className="py-12 bg-gray-50 w-full">
+            <div className="container mx-auto ">
+                <div className='flex justify-between mx-auto w-4/5'>
+                    <h2 className="text-3xl font-bold font-primary text-cyan mb-8 w-2/3"><span className='text-steelBlue'>OneHealth Healthcare </span>Articles</h2>
+                    <div className='ml-32'>
+                        <p className='text-blueGray text-sm font-normal font-sora text-justify'>Healthcare helps people maintain good health and prevent illness.Regular check-ups, vaccinations, and screenings can catch health is.</p>
                     </div>
 
                 </div>
 
-                <div className="grid gap-8 md:grid-cols-4 font-sans">
+                <div className="grid gap-8 md:grid-cols-4 font-sans w-full mt-10">
                     {articles.map((article, index) => (
-                        <div key={index} className="bg-white p-6 rounded-lg shadow-md">
+                        <div key={index} className="bg-white p-6 rounded-lg shadow-md flex flex-col gap-10">
                             <img src={article.Image} alt='' className='w-14' />
-                            <h3 className="text-2xl font-medium text-gray-800 mb-4 mt-3 font-primary">{article.title}</h3>
-                            <p className="text-blueGray font-normal text-start mb-4">{article.description}</p>
-                            <span className="inline-block px-2 py-1 text-2xl font-bold text-turquoiseBlue">FREE</span>
-                            {article.isFree && (
-                                <a href={article.link} className="text-cyan text-base font-medium hover:underline rounded-md border border-cyan px-5 py-2 ml-24">Read Now</a>
-                            )}
+                            <h3 className="text-xl font-medium text-gray-800 font-primary">{article.title}</h3>
+                            <p className="text-blueGray font-normal text-start">{article.description}</p>
+                            <div className='flex justify-between'>
+                                <span className="inline-block px-2 py-1 text-2xl font-bold text-turquoiseBlue">FREE</span>
+                                {article.isFree && (
+                                    <a href={article.link} className="text-cyan text-base font-medium hover:underline rounded-md border border-cyan px-5 py-2">Read Now</a>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>
-                <div className="text-end mt-8">
-                    <a href="#more-articles" className="text-teal-500 hover:underline">View More</a>
+                <div className="text-right mt-8">
+                    <a href="#more-articles" className="text-steelBlue hover:underline">View More</a>
                 </div>
             </div>
         </section>

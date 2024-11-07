@@ -9,7 +9,7 @@ const Navbar = () => {
         `${baseClasses} ${isActive ? 'text-steelBlue font-semibold' : ''}`;
 
     return (
-        <header className="bg-white shadow font-primary fixed top-0 left-0 w-full z-50">
+        <header className="bg-white shadow font-primary fixed top-0 left-0 w-full z-50 text-lg">
             <div className="container mx-auto p-6 flex flex-col md:flex-row justify-between items-center max-w-screen-xl sm:flex-row">
                 <h1 className="text-3xl font-bold text-darkCharcoal mb-4 md:mb-0">DOHS</h1>
                 

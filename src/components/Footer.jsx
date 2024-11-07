@@ -10,7 +10,7 @@ function Footer() {
             <div className="mt-10 grid grid-cols-2">
                 <div className='ml-20'>
                     <h4 className="font-primary text-3xl text-white font-bold mb-4">DOHS</h4>
-                    <p className="text-white font-manrope text-sm font-light leading-5">
+                    <p className="text-white font-manrope text-sm font-light leading-5 w-2/5">
                         Health care refers to the efforts that medical professionals make <br /> to restore our physical and mental well-being.
                         The term also <br /> includes the provision of services to maintain emotional well- <br />being. We call people and organizations
                         that provide these <br /> services health-care providers.
