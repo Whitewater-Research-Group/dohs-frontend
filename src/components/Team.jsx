@@ -46,13 +46,13 @@ const Team = () => {
         <section className="py-12 bg-gray-100">
             <div className="container mx-auto px-4">
                 <h2 className="text-4xl font-sans text-darkCoal font-bold text-center mb-8">Meet our Team</h2>
-                <p className="text-darkCharcoal font-sans text-xl  font-normal text-center mb-8 leading-10 mx-32">
+                <p className="text-darkCharcoal font-sans text-xl  font-normal text-center mb-8 leading-10 md:mx-32">
                     Our team is a harmonious blend of experienced doctors, dedicated researchers, and skilled software developers, ensuring a comprehensive and innovative approach to digital health surveillance.
                     <br />With a wealth of expertise, we share common trends and strategies to improve health outcomes and ensure our platform remains at the forefront of technological advancements.
                     <br />Leveraging our unique skill sets, we create a seamless and user-friendly experience, allowing you to focus on what matters most. Build your next health surveillance solution with confidence, knowing our balanced team is here to support you every step of the way.
                 </p>
 
-                <div className="mb-8 mt-16 font-sans">
+                <div className="mb-8 mt-20 font-sans">
                     <h3 className="text-xl font-semibold text-left text-blueViolet mb-10">Researchers</h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-6">
                         {teamMembers.researchers.map((member, index) => (
@@ -65,7 +65,7 @@ const Team = () => {
                     </div>
                 </div>
 
-                <div className="mt-16 mb-8 font-sans">
+                <div className="mt-20 mb-8 font-sans">
                     <h3 className="text-xl font-semibold text-left text-blueViolet mb-10">Developers</h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-6">
                         {teamMembers.developers.map((member, index) => (
