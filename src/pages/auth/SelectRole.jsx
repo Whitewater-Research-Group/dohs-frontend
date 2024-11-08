@@ -37,13 +37,13 @@ const SelectRole = () => {
     <>
       <Navbar />
 
-      <div className=''>
-        <div className='flex items-center justify-around h-full w-full max-w-6xl my-10 px-4 border-grey bg-white'>
-          <div className='  w-1/2 h-full'>
+      <div className='mt-24'>
+        <div className='flex flex-col md:flex-row items-center justify-around h-full w-full max-w-6xl my-10 px-4 border-grey bg-white'>
+          <div className='w-full md:w-1/2 h-full'>
             <img
               src={hero2}
               alt='Woman with dog'
-              className='w-full md:w-full max-w-full hidden lg:block'
+              className='w-full md:w-full max-w-full lg:block'
             />
           </div>
           <SignInAs />
