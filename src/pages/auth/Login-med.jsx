@@ -3,6 +3,8 @@ import React, { useState } from 'react'
 import hero2 from '../../assets/login2.png'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
+import open from '../../assets/open-eye.png'
+import close from '../../assets/close-eye.png'
 import axios from 'axios'
 
 const Login = () => {
@@ -13,6 +15,14 @@ const Login = () => {
 
   const [Error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+
+  // Toggle password visibility
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
+  }
+
+
 
   // Handler for input changes
   const handleChange = (e) => {
@@ -61,12 +71,12 @@ const Login = () => {
       <Navbar />
 
       <div className='flex flex-col items-center  justify-around'>
-        <div className='flex w-full max-w-6xl mt-32 mb-10 px-4 '>
-          <div className='hidden lg:block'>
+        <div className='flex flex-col md:flex-row w-full max-w-6xl mt-32 mb-10 px-4 '>
+          <div className='lg:block'>
             <img
               src={hero2}
               alt='Woman with dog'
-              className='w-full md:w-full max-w-full hidden lg:block'
+              className='w-full md:w-full max-w-full lg:block'
             />
           </div>
           <form
@@ -106,13 +116,21 @@ const Login = () => {
                 <input
                   id='password'
                   className='p-2 mb-2 border-2 border-secondary rounded-lg w-full hover:border-green focus:border-green active:border-green focus:outline-none active:outline-none text-secondary'
-                  type='password'
                   name='password'
+                  type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleChange}
                   placeholder='Password'
                   required
                 />
+                <button
+                  type='button'
+                  className='absolute right-3 top-3 text-secondary'
+                  onClick={togglePasswordVisibility}
+                >
+                  <img src= {showPassword ? close : open}>
+                   </img>
+                </button>
               </div>
 
               <div className='flex items-center mb-4 mt-4'>
