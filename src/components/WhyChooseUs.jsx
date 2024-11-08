@@ -7,14 +7,14 @@ import Three from '../assets/three_icon.png';
 
 const WhyChooseUs = () => {
     return (
-        <section className="py-20 bg-white">
+        <section className="py-20 bg-white w-full">
             <div className="container text-center flex flex-col items-center">
-                <h3 className="text-4xl font-bold text-center mb-8 text-darkCoal">Why you should choose us?</h3>
+                <h3 className="text-2xl md:text-4xl font-bold text-center mb-8 text-darkCoal">Why you should choose us?</h3>
                 <p className="text-center text-lg font-normal text-darkCoal mb-10">Your health is our responsibility.</p>
 
-                <div className="flex justify-between gap-10 items-center mt-10 w-4/5">
+                <div className="flex justify-between flex-col md:flex-row gap-10 items-center mt-10 w-4/5">
 
-                    <img src={Video} alt="Why Choose Us" className="w-1/2 rounded-md self-stretch" />
+                    <img src={Video} alt="Why Choose Us" className="w-full md:w-1/2 rounded-md self-stretch" />
 
                     <div className='flex flex-col gap-10'>
                         <div className='flex space-x-6'>

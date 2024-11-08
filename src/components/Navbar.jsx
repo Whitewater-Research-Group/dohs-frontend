@@ -9,21 +9,21 @@ const Navbar = () => {
         `${baseClasses} ${isActive ? 'text-steelBlue font-semibold' : ''}`;
 
     return (
-        <header className="bg-white shadow font-primary fixed top-0 left-0 w-full z-50 text-lg">
-            <div className="container mx-auto p-6 flex flex-col md:flex-row justify-between items-center max-w-screen-xl sm:flex-row">
-                <h1 className="text-3xl font-bold text-darkCharcoal mb-4 md:mb-0">DOHS</h1>
+        <header className="bg-white shadow font-primary fixed top-0 left-0 w-full z-50 text-5xl md:text-lg">
+            <div className="container w-full relative mx-auto p-6 flex flex-row justify-between items-center max-w-screen-xl sm:flex-row">
+                <h1 className="text-3xl font-bold text-darkCharcoal mb-4 md:mb-0 w-auto">DOHS</h1>
                 
                 {/* Hamburger Icon */}
                 <button
-                    className="block md:hidden text-darkCharcoal focus:outline-none"
+                    className="md:hidden text-darkCharcoal focus:outline-none"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
                     {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
                 </button>
                 
                 {/* Menu */}
-                <nav className={`md:flex ${isMenuOpen ? 'block' : 'hidden'}`}>
-                    <ul className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-8">
+                <nav className={`absolute left-0 p-10 md:p-0 top-16  bg-white w-full md:w-auto md:top-0 md:relative md:flex flex-col md:flex-row ${isMenuOpen ? 'flex' : 'hidden'}`}>
+                    <ul className="flex flex-col md:flex-row  md:space-y-0 md:space-x-8 w-auto">
                         <li><NavLink to="/" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base")}>Home</NavLink></li>
                         <li><NavLink to="/about" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base")}>About</NavLink></li>
                         <li><a href="#surveillance" className="text-darkCharcoal text-base">Surveillance Data</a></li>

@@ -39,15 +39,15 @@ function Articles() {
     return (
         <section className="py-12 bg-gray-50 w-full">
             <div className="container mx-auto ">
-                <div className='flex justify-between mx-auto w-4/5'>
-                    <h2 className="text-3xl font-bold font-primary text-cyan mb-8 w-2/3"><span className='text-steelBlue'>OneHealth Healthcare </span>Articles</h2>
-                    <div className='ml-32'>
-                        <p className='text-blueGray text-sm font-normal font-sora text-justify'>Healthcare helps people maintain good health and prevent illness.Regular check-ups, vaccinations, and screenings can catch health is.</p>
+                <div className='flex flex-col md:flex-row justify-between mx-auto w-4/5'>
+                    <h2 className="text-3xl font-bold font-primary text-cyan mb-8 w-full text-center md:text-left md:w-2/3 mx-auto"><span className='text-steelBlue'>OneHealth Healthcare </span>Articles</h2>
+                    <div className='md:ml-32 w-4/5 mx-auto'>
+                        <p className='text-blueGray text-sm font-normal font-sora text-center md:text-justify'>Healthcare helps people maintain good health and prevent illness.Regular check-ups, vaccinations, and screenings can catch health is.</p>
                     </div>
 
                 </div>
 
-                <div className="grid gap-8 md:grid-cols-4 font-sans w-full mt-10">
+                <div className="grid gap-8 md:grid-cols-4 font-sans w-5/6 mx-auto md:w-full mt-10">
                     {articles.map((article, index) => (
                         <div key={index} className="bg-white p-6 rounded-lg shadow-md flex flex-col gap-10">
                             <img src={article.Image} alt='' className='w-14' />
@@ -62,7 +62,7 @@ function Articles() {
                         </div>
                     ))}
                 </div>
-                <div className="text-right mt-8">
+                <div className="text-center md:text-right mt-8">
                     <a href="#more-articles" className="text-steelBlue hover:underline">View More</a>
                 </div>
             </div>

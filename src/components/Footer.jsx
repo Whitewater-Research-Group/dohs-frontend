@@ -6,21 +6,21 @@ import Twitter from '../assets/twitter_icon.png';
 
 function Footer() {
     return (
-        <footer className="bg-gray-900 text-white py-10">
-            <div className="mt-10 grid grid-cols-2">
-                <div className='ml-20'>
+        <footer className="bg-gray-900 text-white py-2 md:py-10 px-2 md:px-0">
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-2">
+                <div className='md:ml-20'>
                     <h4 className="font-primary text-3xl text-white font-bold mb-4">DOHS</h4>
-                    <p className="text-white font-manrope text-sm font-light leading-5 w-2/5">
-                        Health care refers to the efforts that medical professionals make <br /> to restore our physical and mental well-being.
-                        The term also <br /> includes the provision of services to maintain emotional well- <br />being. We call people and organizations
-                        that provide these <br /> services health-care providers.
+                    <p className="text-white font-manrope text-sm font-light leading-5 w-3/4 md:w-1/2">
+                        Health care refers to the efforts that medical professionals make to restore our physical and mental well-being.
+                        The term also includes the provision of services to maintain emotional well-being. We call people and organizations
+                        that provide these services health-care providers.
 
                     </p>
                 </div>
 
-                <div className='-ml-60 grid grid-cols-4 '>
+                <div className='md:-ml-60 grid grid-cols-1 md:grid-cols-4 '>
                     <div className=''>
-                        <h4 className="text-xl font-manrope text-turquoiseBlue font-bold mb-4">Overview</h4>
+                        <h4 className="text-xl font-manrope text-turquoiseBlue font-bold mb-4 mt-4 md:mt-0">Overview</h4>
                         <ul className='text-white font-manrope text-sm font-light'>
                             <li className="mb-2"><a href="#report">Report Generation</a></li>
                             <li className="mb-2"><a href="#map">Surveillance Map</a></li>

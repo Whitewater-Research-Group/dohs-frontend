@@ -8,8 +8,8 @@ import right_arrow from '../assets/b_right_arrow.png';
 
 const Services = () => {
     return (
-        <section className="py-20 bg-gray-50 font-primary w-full">
-            <div className="container mx-auto flex flex-col w-4/5">
+        <section className="py-20 px-10 md:px-0 bg-gray-50 font-primary w-full mx-auto left-4 ">
+            <div className="container mx-auto flex flex-col w-full md:w-4/5">
                 <h3 className="text-4xl font-bold text-center mb-8 text-darkCoal">Services we offer you</h3>
                 <p className='text-center text-lg font-normal text-darkCoal mb-20'>With a comprehensive suite of tools, you can effortlessly monitor and manage <br /> public health data. Enhance your surveillance capabilities today.</p>
 
