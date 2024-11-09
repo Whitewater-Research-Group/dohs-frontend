@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import hero from '../../assets/register.jpg'
+import  { useState } from 'react'
 import hero2 from '../../assets/login1.png'
 import axios from 'axios'
 import Navbar from '../../components/Navbar'
@@ -154,7 +153,7 @@ const NonHealthLogin = () => {
                 Sign in
               </button>
               <p className='mt-4 text-center'>
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <a href='/signup' className='text-green'>
                   Sign up
                 </a>

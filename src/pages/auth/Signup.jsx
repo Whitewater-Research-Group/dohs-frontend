@@ -1,7 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import hero from '../../assets/register2.png'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
+import open from '../../assets/open-eye.png'
+import close from '../../assets/close-eye.png'
+import negative from '../../assets/x-mark.png'
+import positive from '../../assets/check.png'
 
 import axios from 'axios'
 
@@ -29,10 +33,22 @@ const SignUp = () => {
   })
 
   //frontend State Validation
-  const [errors, setErrors] = useState({}) //Maros' State Validation
   const [isFormValid, setIsFormValid] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  
+  const [errors, setErrors] = useState({
+    firstname: { message: 'First name is required', valid: false },
+    lastname: { message: 'Last name is required', valid: false },
+    email: { message: 'Invalid email', valid: false },
+    designation: { message: 'Designation is required', valid: false },
+    license_number: { message: 'License number is required for Medical Doctors', valid: false },
+    password: { message: 'Password must meet the requirements', valid: false },
+    confirmPassword: { message: 'Passwords do not match', valid: false },
+    location: { message: 'Location is required', valid: false },
+    terms: { message: 'You must agree to the terms and conditions', valid: false },
+  }) //Maro's state validation
+
 
   //Backend  State Validation
   const [error, setError] = useState(null) // Daniels State Validation
@@ -40,32 +56,40 @@ const SignUp = () => {
 
   // Regular expressions for validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\W]{8,}$/
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\W]{8,}$/;
+
+
+
 
   // Validate form data
   const validateForm = () => {
-    let formErrors = {}
-
-    if (!formData.firstname) formErrors.firstName = '* First name is required'
-    if (!formData.lastname) formErrors.lastName = '* Last name is required'
-    if (!formData.email || !emailRegex.test(formData.email))
-      formErrors.email = '* Invalid email'
-    if (!formData.designation)
-      formErrors.designation = '* Designation is required'
-    if (formData.designation === 'Medical Doctor' && !formData.license_number)
-      formErrors.licenseNumber =
-        '* License number is required for Medical Doctors'
-    if (!formData.password || !passwordRegex.test(formData.password))
-      formErrors.password =
-        '* Password must be at least 8 characters long, contain numbers, symbols, and uppercase letters'
-    if (formData.password !== formData.confirmPassword)
-      formErrors.confirmPassword = '* Passwords do not match'
-    if (!formData.location) formErrors.location = '* Location is required'
-    if (!formData.terms)
-      formErrors.terms = '* You must agree to the terms and conditions'
-
-    return formErrors
+    let formErrors = {
+      firstname: { message: 'First name is required', valid: !!formData.firstname },
+      lastname: { message: 'Last name is required', valid: !!formData.lastname },
+      email: { message: 'Enter a valid email', valid: emailRegex.test(formData.email) },
+      designation: { message: 'Designation is required', valid: !!formData.designation },
+      license_number: {
+        message: 'License number is required for Medical Doctors',
+        valid: formData.designation !== 'Medical Doctor' || !!formData.license_number,
+      },
+      password: {
+        message: 'Password must be strong',
+        valid: passwordRegex.test(formData.password),
+      },
+      confirmPassword: {
+        message: 'Passwords must match',
+        valid: (formData.password === '' || formData.confirmPassword === '') ? false : formData.password === formData.confirmPassword,
+      },
+      location: { message: 'Location is required', valid: !!formData.location },
+      terms: { message: 'You must agree to the terms and conditions', valid: formData.terms },
+    }
+    setErrors(formErrors)
+    setIsFormValid(Object.values(formErrors).every((error) => error.valid))
   }
+
+  useEffect(() => {
+    validateForm()
+  }, [formData])
 
   // Handler for input changes
   const handleChange = (e) => {
@@ -76,11 +100,6 @@ const SignUp = () => {
     }))
   }
 
-  useEffect(() => {
-    const formErrors = validateForm()
-    setErrors(formErrors)
-    setIsFormValid(Object.keys(formErrors).length === 0)
-  }, [formData])
 
   // Handler for form submission
   const handleSubmit = async (e) => {
@@ -143,6 +162,11 @@ const SignUp = () => {
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword)
   }
+
+  const renderValidationIcon = (valid) => (
+    <img src={valid ? positive : negative} alt='' className='inline-block w-4 h-4 mr-2' />
+  )
+
 
   return (
     <>
@@ -247,7 +271,7 @@ const SignUp = () => {
                 <div className='flex-col mb-4 relative'>
                   <label
                     className='text-gray-700 text-xs absolute -top-3 left-3 bg-white p-1'
-                    htmlFor='licenseNumber'
+                    htmlFor='license_number'
                   >
                     License Number
                   </label>
@@ -255,7 +279,7 @@ const SignUp = () => {
                     id='license_number'
                     className='p-2 mb-2 border-2 border-secondary rounded-lg w-full text-secondary hover:border-green focus:border-green active:border-green focus:outline-none active:outline-none'
                     type='text'
-                    name='licenseNumber'
+                    name='license_number'
                     value={formData.license_number}
                     onChange={handleChange}
                     placeholder='License Number'
@@ -285,7 +309,8 @@ const SignUp = () => {
                   className='absolute right-3 top-3 text-secondary'
                   onClick={togglePasswordVisibility}
                 >
-                  {showPassword ? 'Hide' : 'Show'}
+                  <img src= {showPassword ? close : open}>
+                  </img>
                 </button>
               </div>
 
@@ -311,7 +336,8 @@ const SignUp = () => {
                   className='absolute right-3 top-3 text-secondary'
                   onClick={toggleConfirmPasswordVisibility}
                 >
-                  {showConfirmPassword ? 'Hide' : 'Show'}
+                  <img src= {showConfirmPassword ? close : open}>
+                   </img>
                 </button>
               </div>
 
@@ -336,7 +362,7 @@ const SignUp = () => {
 
               <div className='flex items-center self-center mb-4 mt-4'>
                 <input
-                  className='mr-2 bg-black'
+                  className='mr-2 custom-checkbox '
                   type='checkbox'
                   name='terms'
                   checked={formData.terms}
@@ -346,14 +372,19 @@ const SignUp = () => {
                 <label>I’ve read and agreed with Terms and conditions</label>
               </div>
 
-              {Object.keys(errors).length > 0 && (
-                <div className='bg-red mb-4 text-xs p-3 rounded-sm text-wine'>
-                  {Object.values(errors).map((error, index) => (
-                    <div key={index}>{error}</div>
-                  ))}
-                </div>
-              )}
+              <div className='validation-messages mt-4'>
+              {Object.entries(errors).map(([field, { message, valid }], index) => {
+                if (field === 'license_number' && formData.designation !== 'Medical Doctor') return null
 
+                return (
+                  <div key={index} className='flex items-center mb-2 text-xs'>
+                    {renderValidationIcon(valid)}
+                    <span className={valid ? 'text-darkGreen' : 'text-red'}>{message}</span>
+                  </div>
+                    )
+                  })}
+              </div>
+          
               <button
                 className={`p-2 rounded-lg text-white w-full ${
                   isFormValid ? 'bg-secondary hover:bg-green' : 'bg-grey'

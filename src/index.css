@@ -3,3 +3,38 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* This is to remove the chrome default auto-fill effect*/
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+}
+
+
+/* This is the custom styling to make the checkbox black*/
+.custom-checkbox {
+    appearance: none;
+    width: 0.75rem;
+    height: 0.75rem;
+    background-color: black;
+    border: 1px solid #4A5568; 
+    border-radius: 0.125rem; 
+  }
+  
+  .custom-checkbox:checked {
+    background-color: black;
+    border-color: black;
+    position: relative;
+  }
+
+  .custom-checkbox:checked::before {
+    content: '✔'; /* Unicode checkmark */
+    color: white;
+    font-size: 0.75rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }

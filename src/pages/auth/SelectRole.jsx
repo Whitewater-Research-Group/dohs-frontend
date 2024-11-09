@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 // import hero from '../../../assets/register.jpg'
 import hero2 from '../../assets/select1.png'
 import Navbar from '../../components/Navbar'
@@ -6,32 +5,6 @@ import Footer from '../../components/Footer'
 import SignInAs from '../../components/auth/SignInAs'
 
 const SelectRole = () => {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    designation: '',
-    licenseNumber: '',
-    password: '',
-    confirmPassword: '',
-    location: '',
-  })
-
-  // Handler for input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }))
-  }
-
-  // Handler for form submission
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // Handle form submission here, e.g., sending data to the backend
-    console.log('Form data:', formData)
-  }
 
   return (
     <>

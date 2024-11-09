@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 // import hero from '../assets/register.jpg'
 import hero2 from '../../assets/login2.png'
 import Navbar from '../../components/Navbar'
@@ -150,7 +150,7 @@ const Login = () => {
                 Sign in
               </button>
               <p className='mt-4 text-center'>
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <a href='/signup' className='text-green'>
                   Sign up
                 </a>
