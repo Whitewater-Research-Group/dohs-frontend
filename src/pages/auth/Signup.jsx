@@ -22,7 +22,7 @@ const SignUp = () => {
     terms: false,
   })
 
-  const [sentFormData, setSentFormData] = useState({
+  const [sentFormData] = useState({
     firstname: '',
     lastname: '',
     email: '',
@@ -173,11 +173,11 @@ const SignUp = () => {
       <Navbar />
 
       <div className='flex flex-col items-center mt-32'>
-        <div className='flex w-full max-w-6xl my-10 px-4'>
+        <div className='flex flex-col md:flex-row w-full max-w-6xl my-10 px-4'>
           <img
             src={hero}
             alt='Woman with dog'
-            className='w-full md:w-1/2 max-w-full hidden lg:block'
+            className='w-full md:w-1/2 max-w-full lg:block'
           />
           <form
             className='flex flex-col justify-between p-6 md:p-8 w-full md:w-full lg:w-1/2 text-left'
@@ -369,7 +369,7 @@ const SignUp = () => {
                   onChange={handleChange}
                   required
                 />
-                <label>I’ve read and agreed with Terms and conditions</label>
+                <label className='text-xs md:text-sm'>I’ve read and agreed with Terms and conditions</label>
               </div>
 
               <div className='validation-messages mt-4'>
