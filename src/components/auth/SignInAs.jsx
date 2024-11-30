@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const SignInAs = () => {
@@ -19,7 +18,7 @@ const SignInAs = () => {
         </div>
       </div>
       <div className="text-center mt-6">
-          <p>Don`t have an account? <a href="/signup" className="text-secondary hover:underline">Sign Up</a></p>
+          <p>Don`t have an account? <Link to="/signup" className="text-secondary hover:underline">Sign Up</Link></p>
         </div>
     </div>
   );

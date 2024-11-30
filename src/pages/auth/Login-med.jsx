@@ -6,6 +6,7 @@ import Footer from '../../components/Footer'
 import open from '../../assets/open-eye.png'
 import close from '../../assets/close-eye.png'
 import axios from 'axios'
+import { Link } from 'react-router-dom';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -151,9 +152,9 @@ const Login = () => {
               </button>
               <p className='mt-4 text-center'>
                 Don&apos;t have an account?{' '}
-                <a href='/signup' className='text-green'>
+                <Link to='/signup' className='text-green'>
                   Sign up
-                </a>
+                </Link>
               </p>
             </div>
           </form>

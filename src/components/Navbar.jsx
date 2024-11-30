@@ -4,6 +4,9 @@ import { FaBars, FaTimes } from 'react-icons/fa'; // Import icons from react-ico
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
 
     const navLinkClass = (isActive, baseClasses) =>
         `${baseClasses} ${isActive ? 'text-steelBlue font-semibold' : ''}`;
@@ -28,23 +31,18 @@ const Navbar = () => {
                         <li><NavLink to="/about" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base")}>About</NavLink></li>
                         <li><a href="#surveillance" className="text-darkCharcoal text-base">Surveillance Data</a></li>
 
-                        {/* todo: fix this submenu */}
-                        <li className="relative group">
-                            <NavLink to="/report-env-inc" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base")}>
-                                Report
-                            </NavLink>
-                            <ul className="absolute hidden group-hover:block bg-white shadow-lg rounded-md mt-2">
-                                <li>
-                                    <NavLink to="/report-env-inc" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base block px-4 py-2 hover:bg-gray-200")}>
-                                        Environmental Inclusiveness
-                                    </NavLink>
-                                </li>
-                                <li>
-                                    <NavLink to="/report-dis-cas" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base block px-4 py-2 hover:bg-gray-200")}>
-                                        Disease Cases
-                                    </NavLink>
-                                </li>
-                            </ul>
+                        
+
+                        <li className="relative">
+                            {/* Dropdown Toggle */}
+                            <button onClick={toggleDropdown}   className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base focus:outline-none")}>Report</button>
+                                {/* Dropdown Menu */}
+                                {isDropdownOpen && (
+                                    <ul className="relative md:absolute left-0 mt-2 bg-white md:shadow-lg md:rounded-md">
+                                        <li><NavLink to="/report-env-inc" className={({ isActive }) => navLinkClass(isActive, "block text-base px-4 py-2 text-darkCharcoal hover:bg-gray-200")}> Environmental Inclusiveness</NavLink></li>
+                                        <li><NavLink to="/report-dis-cas" className={({ isActive }) => navLinkClass(isActive, "block text-base px-4 py-2 text-darkCharcoal hover:bg-gray-200")}>Disease Cases</NavLink></li>
+                                    </ul>
+                                )}
                         </li>
 
 
