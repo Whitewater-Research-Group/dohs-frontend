@@ -7,7 +7,7 @@ import Three from '../assets/three_icon.png';
 
 const WhyChooseUs = () => {
     return (
-        <section className="py-20 bg-white w-full">
+        <section className="py-20 bg-white w-full flex justify-center">
             <div className="container text-center flex flex-col items-center">
                 <h3 className="text-2xl md:text-4xl font-bold text-center mb-8 text-darkCoal">Why you should choose us?</h3>
                 <p className="text-center text-lg font-normal text-darkCoal mb-10">Your health is our responsibility.</p>
