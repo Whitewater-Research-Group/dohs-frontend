@@ -48,7 +48,7 @@ const Navbar = () => {
 
                         <li><NavLink to="/stakeholder" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base")}>Stakeholder Portal</NavLink></li>
                         <li><NavLink to="/login" className={({ isActive }) => navLinkClass(isActive, "text-darkCharcoal text-base")}>Login</NavLink></li>
-                        <li><a href="tel:+2348022918109" className="text-cyan text-base pl-0 md:pl-8">Call <span className='font-bold'>802 291 8109 or</span></a></li>
+                        <li><a href="tel:+2348022918109" className="text-cyan text-base pl-0 md:pl-8">Call <span className='font-bold'>0802 291 8109</span> or</a></li>
                         <li><NavLink to="/contact" className="text-white text-base font-medium bg-turquoiseBlue rounded-full px-4 py-2 hover:bg-white hover:text-turquoiseBlue">Consult Online</NavLink></li>
                     </ul>
                 </nav>
