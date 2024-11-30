@@ -38,6 +38,8 @@ export default {
         'red': '#dc3545',
         'wine': '#d8000c',
         'danger': '#FF0000',
+        'ash': '#F4F7FA',
+        'darkGray': '#07292BC7'
       },
     },
   },

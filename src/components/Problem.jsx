@@ -5,7 +5,7 @@ const Problem = () => {
     return (
         <section className="py-12">
             <div className="container mx-auto px-4 font-sans text-darkCoal">
-                <h2 className="text-2xl md:text-6xl font-bold mb-4 md:mr-96">What problem are we solving?</h2>
+                <h2 className="text-2xl md:text-4xl font-bold mb-4 md:mr-96">What problem are we solving?</h2>
                 <p className="mb-8 leading-9 mt-10 text-left text-xl">
                     DOHS is a holistic and systems-based approach that recognizes the interconnection between the health of humans, animals,
                     plants, and the environment. This potent and intelligent mapping effectively informs and predicts future infectious

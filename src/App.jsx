@@ -14,7 +14,9 @@ import EnvironmentalIncidentReportForm from './pages/report-gen/Environmental'
 import Contact from './pages/contact/Contact'
 import Chatbot from './pages/chatbot/Chatbot' 
 import Surveillance from './pages/surveillance-data/Surveillance'
+import Stakeholder from './pages/stakeholder/Stakeholder'
 import './App.css'
+
 
 function App() {
   return (
@@ -33,6 +35,7 @@ function App() {
         <Route path='/contact' element={<Contact />} />
         <Route path='/chatbot' element={<Chatbot />} />
         <Route path='/surveillance' element={<Surveillance />} />
+        <Route path='/stakeholder' element={<Stakeholder />} />
         
       </Routes>
     </Router>
