@@ -10,7 +10,7 @@ const SelectRole = () => {
     <>
       <Navbar />
 
-      <div className='mt-24'>
+      <div className='mt-20 flex justify-center'>
         <div className='flex flex-col md:flex-row items-center justify-around h-full w-full max-w-6xl my-10 px-4 border-grey bg-white'>
           <div className='w-full md:w-1/2 h-full'>
             <img

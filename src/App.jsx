@@ -9,8 +9,11 @@ import NonHealthDashboard from './pages/dashboard/NonHealthDashboard'
 import HealthDashboard from './pages/dashboard/NonHealthDashboard'
 import Home from './pages/home/Home'
 import About from './pages/about/About'
-// import DiseaseCaseReport from './pages/report-gen/disease-cases-zipped/disease-cases/src'
-// import EnvironmentalIncidentReportForm from './pages/report-gen/environment-cases-zipped/src' 
+import DiseaseCaseReport from './pages/report-gen/Disease'
+import EnvironmentalIncidentReportForm from './pages/report-gen/Environmental'
+import Contact from './pages/contact/Contact'
+import Chatbot from './pages/chatbot/Chatbot' 
+import Surveillance from './pages/surveillance-data/Surveillance'
 import './App.css'
 
 function App() {
@@ -25,11 +28,11 @@ function App() {
         <Route path='/health-dashboard' element={<HealthDashboard />} />
         <Route path='/' element={<Home />} />
         <Route path='/about' element={<About />} />
-        {
-          //<Route path='/report' element={<DiseaseCaseReport />} />
-          //<Route path='/report-dis-cas' element={<DiseaseCaseReport />} /> 
-          //<Route path='/report-env-inc' element={<EnvironmentalIncidentReportForm />} />
-        } 
+        <Route path='/report-dis-cas' element={<DiseaseCaseReport />} /> 
+        <Route path='/report-env-inc' element={<EnvironmentalIncidentReportForm />} />
+        <Route path='/contact' element={<Contact />} />
+        <Route path='/chatbot' element={<Chatbot />} />
+        <Route path='/surveillance' element={<Surveillance />} />
         
       </Routes>
     </Router>

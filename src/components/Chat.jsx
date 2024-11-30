@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Ivie from '../assets/ivie_bot.png';
 
 function Chat() {
@@ -21,7 +22,7 @@ function Chat() {
 
                     <div className='my-10 md:my-28 rounded-md mx-auto md:mx-0 w-1/2 bg-white p-10'>
                         <div className='flex items-center justify-center'>
-                            <a href='#' className='font-normal font-rale text-2xl text-white bg-turquoiseBlue text-center px-10 py-2 rounded-md'>Chat</a>
+                            <Link to='/chatbot' className='font-normal font-rale text-2xl text-white bg-turquoiseBlue text-center px-10 py-2 rounded-md'>Chat</Link>
                         </div>
                     </div>
 

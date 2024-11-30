@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import React from 'react';
+import {Link} from 'react-router-dom';
 import Facebook from '../assets/facebook_icon.png';
 import Instagram from '../assets/instagram_icon.png';
 import Twitter from '../assets/twitter_icon.png';
@@ -35,8 +36,8 @@ function Footer() {
                     <div>
                         <h4 className="text-xl font-manrope text-turquoiseBlue font-bold mb-4">Company</h4>
                         <ul className='text-white font-manrope text-sm font-light'>
-                            <li className="mb-2"><a href="#about">Home</a></li>
-                            <li className="mb-2"><a href="#about">About Us</a></li>
+                            <li className="mb-2"><Link to="/">Home</Link></li>
+                            <li className="mb-2"><Link to="/about">About Us</Link></li>
                             <li className="mb-2"><a href="#services" >Services</a></li>
                         </ul>
                     </div>
@@ -51,8 +52,8 @@ function Footer() {
 
                         <h4 className="mt-10 text-xl font-manrope text-turquoiseBlue font-bold mb-4">Contact Us</h4>
                         <ul>
-                            <li className="mb-2"><a href="#blog" className="font-bold font-primary text-base">+234 123 456 7890</a></li>
-                            <li className="mb-2"><a href="#privacy" className="font-bold font-primary text-base">whitewateresearchgroup@gmail.com</a></li>
+                            <li className="mb-2"><a href="tel:+2348022918109" className="font-bold font-primary text-base">+234 802 291 8109</a></li>
+                            <li className="mb-2"><a href="mailto:whitewateresearchgroup@gmail.com" className="font-bold font-primary text-base">whitewateresearchgroup@gmail.com</a></li>
                         </ul>
                     </div>
 
