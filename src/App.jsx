@@ -17,6 +17,7 @@ import Surveillance from './pages/surveillance-data/Surveillance'
 import Stakeholder from './pages/stakeholder/Stakeholder';
 import OverviewDashboard from './pages/(stakeholders)/dashboard/Overview'
 import './App.css'
+import InteractiveMap from './pages/(stakeholders)/dashboard/Gis'
 
 
 function App() {
@@ -39,6 +40,8 @@ function App() {
         <Route path='/stakeholder' element={<Stakeholder />} />
         
         <Route path='/stakeholder/dashboard' element={<OverviewDashboard />} />
+        <Route path='/stakeholder/dashboard/map' element={<InteractiveMap />} />
+        
         
         
       </Routes>

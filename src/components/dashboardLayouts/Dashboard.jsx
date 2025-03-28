@@ -6,18 +6,22 @@ import {
   X,
   LogOut,
   BarChart2,
+  MapIcon,
   FileText,
   Folder,
   AlertTriangle,
+  MapPin,
 } from 'lucide-react';
 import avatarImage from '../../assets/avatar.png';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const menuItems = [
     { title: 'Overview', icon: BarChart2, path: '/' },
+    { title: 'Interactive Map', icon: MapPin, path: '/stakeholder/dashboard/map' },
     { title: 'Reports', icon: FileText, path: '/reports' },
     { title: 'Projects', icon: Folder, path: '/projects' },
     { title: 'Epidemic Reports', icon: AlertTriangle, path: '/epidemic-reports' },
+
   ];
 
 return (
@@ -27,7 +31,7 @@ return (
         } h-screen bg-white shadow-lg transition-all duration-300 ease-in-out fixed left-0 top-0`}
     >
         <div className="p-4 border-b flex items-center justify-between">
-            <h1 className={`font-bold ${isOpen ? 'block' : 'hidden'}`}>Health Dashboard</h1>
+            <h1 className={`font-bold ${isOpen ? 'block' : 'hidden'}`}>DOHS Dashboard</h1>
             <button
                 onClick={toggleSidebar}
                 aria-label="Toggle Sidebar"
@@ -47,7 +51,7 @@ return (
                 </div>
             </div>
             <div className="w-48 bg-white p-4">
-      <nav className="space-y-4">
+      {/* <nav className="space-y-4">
         <div className="flex space-x-4 text-sm text-gray-500 mb-4">
           <span className="hover:text-gray-900 cursor-pointer">Favorites</span>
           <span className="hover:text-gray-900 cursor-pointer">Recently</span>
@@ -60,14 +64,18 @@ return (
           <li className="text-gray-900 hover:bg-gray-100 rounded px-2 py-1 cursor-pointer">
             Reports
           </li>
+
+          <li className="text-gray-900 hover:bg-gray-100 rounded px-2 py-1 cursor-pointer">
+            Map
+          </li>
         </ul>
-      </nav>
+      </nav> */}
     </div>
 
 
     <div className="flex space-x-4 text-sm text-gray-500 mb-4">
-          <span className="hover:text-gray-900 cursor-pointer">Favorites</span>
-          <span className="hover:text-gray-900 cursor-pointer">Recently</span>
+          {/* <span className="hover:text-gray-900 cursor-pointer">Favorites</span>
+          <span className="hover:text-gray-900 cursor-pointer">Recently</span> */}
         </div>
             {menuItems.map((item, index) => (
                 <a
