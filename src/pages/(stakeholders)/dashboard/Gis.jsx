@@ -11,24 +11,54 @@ import {
   LayersControl,
   LayerGroup,
   useMap,
+  Tooltip,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import nigeriaGeoJson from "../../../geodata.json"; // Make sure to adjust the path
 
 const sampleHealthData = [
-  { id: 1, name: "Lagos", lat: 6.5244, lon: 3.3792, cases: 200 },
-  { id: 2, name: "Abuja", lat: 9.0578, lon: 7.4951, cases: 120 },
-  { id: 3, name: "Kano", lat: 12.0022, lon: 8.5919, cases: 90 },
-  { id: 4, name: "Port Harcourt", lat: 4.8156, lon: 7.0498, cases: 60 },
-  { id: 5, name: "Uniben", lat: 6.3998, lon: 5.6099, cases: 1 },
+  {
+    id: 1,
+    name: "Lagos",
+    lat: 6.5244,
+    lon: 3.3792,
+    cases: 200,
+    disease: "COVID-19",
+  },
+  {
+    id: 2,
+    name: "Abuja",
+    lat: 9.0578,
+    lon: 7.4951,
+    cases: 120,
+    disease: "Ebola",
+  },
+  {
+    id: 3,
+    name: "Kano",
+    lat: 12.0022,
+    lon: 8.5919,
+    cases: 90,
+    disease: "Measles",
+  },
+  {
+    id: 4,
+    name: "Port Harcourt",
+    lat: 4.8156,
+    lon: 7.0498,
+    cases: 60,
+    disease: "COVID-19",
+  },
+  {
+    id: 5,
+    name: "Uniben",
+    lat: 6.3998,
+    lon: 5.6099,
+    cases: 1,
+    disease: "Ebola",
+  },
 ];
-
-const healthIcon = new L.Icon({
-  iconUrl:
-    "https://th.bing.com/th/id/OIP.MPwEcSNvtMtQ79OVik-dagHaHa?w=162&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7",
-  iconSize: [25, 25],
-});
 
 function InteractiveMap() {
   const [healthData, setHealthData] = useState([]);
@@ -64,6 +94,51 @@ function InteractiveMap() {
     fillOpacity: 0.1,
     opacity: 1,
   });
+
+  // Add back custom colored marker icons for each disease
+  const diseaseIcons = {
+    "COVID-19": new L.Icon({
+      iconUrl:
+        "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowUrl:
+        "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+      shadowSize: [41, 41],
+    }),
+    Ebola: new L.Icon({
+      iconUrl:
+        "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowUrl:
+        "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+      shadowSize: [41, 41],
+    }),
+    Measles: new L.Icon({
+      iconUrl:
+        "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png",
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowUrl:
+        "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+      shadowSize: [41, 41],
+    }),
+    // Default/other
+    default: new L.Icon({
+      iconUrl:
+        "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowUrl:
+        "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
+      shadowSize: [41, 41],
+    }),
+  };
 
   return (
     <DashboardLayout>
@@ -120,7 +195,10 @@ function InteractiveMap() {
             {/* ✅ Overlay: Health Facilities */}
             <LayersControl.Overlay name="Health Facilities">
               <LayerGroup>
-                <Marker position={[6.5244, 3.3792]} icon={healthIcon}>
+                <Marker
+                  position={[6.5244, 3.3792]}
+                  icon={diseaseIcons["default"]}
+                >
                   <Popup>Lagos Health Facility</Popup>
                 </Marker>
               </LayerGroup>
@@ -130,19 +208,36 @@ function InteractiveMap() {
             <LayersControl.Overlay name="Disease Outbreaks">
               <LayerGroup>
                 {healthData.map((location) => (
-                  <CircleMarker
+                  <Marker
                     key={location.id}
-                    center={[location.lat, location.lon]}
-                    radius={Math.log(location.cases) * 2}
-                    fillOpacity={0.5}
-                    color="red"
+                    position={[location.lat, location.lon]}
+                    icon={
+                      diseaseIcons[location.disease] || diseaseIcons["default"]
+                    }
                   >
+                    <Tooltip
+                      direction="top"
+                      offset={[0, -20]}
+                      opacity={1}
+                      permanent={false}
+                    >
+                      <div>
+                        <strong>{location.name}</strong>
+                        <br />
+                        Disease: {location.disease}
+                        <br />
+                        Cases: {location.cases}
+                        {/* Add more info here if needed */}
+                      </div>
+                    </Tooltip>
                     <Popup>
                       <strong>{location.name}</strong>
                       <br />
+                      Disease: {location.disease}
+                      <br />
                       Cases: {location.cases}
                     </Popup>
-                  </CircleMarker>
+                  </Marker>
                 ))}
               </LayerGroup>
             </LayersControl.Overlay>
@@ -168,3 +263,5 @@ export default InteractiveMap;
 //   10) Add a button to import custom GeoJSON data
 //   11) Add a button to clear all markers and layers from the map
 //   12) Add a button to save the current map view (zoom level, center position) for future reference
+
+// add icons (with different colrs) for the different disease cases
