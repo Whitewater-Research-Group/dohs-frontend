@@ -39,7 +39,11 @@ const SignUp = () => {
       message: "License number is required for Medical Doctors",
       valid: false,
     },
-    password: { message: "Password must meet the requirements", valid: false },
+    password: {
+      message:
+        "Password must be at least 8 characters long and contain an uppercase letter, a number, and a special character",
+      valid: false,
+    },
     confirmPassword: { message: "Passwords do not match", valid: false },
     location: { message: "Location is required", valid: false },
     terms: {
@@ -87,7 +91,8 @@ const SignUp = () => {
           !!formData.license_number,
       },
       password: {
-        message: "Password must be strong",
+        message:
+          "Password must be at least 8 characters long and contain an uppercase letter, a number, and a special character",
         valid: passwordRegex.test(formData.password),
       },
       confirmPassword: {
