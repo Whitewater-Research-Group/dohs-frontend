@@ -10,13 +10,14 @@ import { Link } from "react-router-dom";
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    license_number: "",
+    email: "",
     password: "",
   });
 
   const [Error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Toggle password visibility
   const togglePasswordVisibility = () => {
@@ -34,6 +35,9 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
+    setIsLoading(true);
 
     try {
       const loginEndpoint = "https://dohs.onrender.com/api/v1/health/login";
@@ -43,17 +47,22 @@ const Login = () => {
       if (
         response.status >= 200 &&
         response.status < 300 &&
-        response.data.token
+        response.data.access_token
       ) {
-        localStorage.setItem("authToken", response.data.token);
+        // Store the access token
+        localStorage.setItem("authToken", response.data.access_token);
+
+        // Store user data
+        localStorage.setItem("user", JSON.stringify(response.data.user));
 
         setFormData({
-          license_number: "",
+          email: "",
           password: "",
         });
 
         setSuccess("User logged in successfully");
 
+        // Redirect based on user role
         window.location.href = "/health-dashboard";
       } else {
         console.error("Unexpected response format:", response.data);
@@ -61,7 +70,23 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Login request failed:", error);
-      setError("Invalid License Number or Password");
+
+      if (error.response) {
+        // The server responded with an error status
+        const errorMessage =
+          error.response.data.msg ||
+          error.response.data.message ||
+          "Invalid email or password";
+        setError(errorMessage);
+      } else if (error.request) {
+        // The request was made but no response was received
+        setError("No response from server. Please try again.");
+      } else {
+        // Something happened in setting up the request
+        setError("An error occurred. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -89,18 +114,18 @@ const Login = () => {
               <div className="flex flex-col mb-4 relative">
                 <label
                   className=" text-gray-700 text-xs absolute -top-3 left-3 bg-white p-1 rounded"
-                  htmlFor="license_number"
+                  htmlFor="email"
                 >
-                  License Number
+                  Email Address
                 </label>
                 <input
-                  id="license_number"
+                  id="email"
                   className="p-2 mb-2 border-2 border-secondary rounded-lg w-full hover:border-green focus:border-green active:border-green focus:outline-none active:outline-none text-secondary"
-                  type="text"
-                  name="license_number"
-                  value={formData.license_number}
+                  type="email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
-                  placeholder="License Number"
+                  placeholder="Enter your email"
                   required
                 />
               </div>
@@ -142,10 +167,11 @@ const Login = () => {
                 <p className="text-secondary text-center">{success}</p>
               )}
               <button
-                className="p-2 bg-secondary text-white rounded-md hover:bg-green w-full"
+                className="p-2 bg-secondary text-white rounded-md hover:bg-green w-full disabled:bg-gray-400"
                 type="submit"
+                disabled={isLoading}
               >
-                Sign in
+                {isLoading ? "Signing in..." : "Sign in"}
               </button>
               <p className="mt-4 text-center">
                 Don&apos;t have an account?{" "}
