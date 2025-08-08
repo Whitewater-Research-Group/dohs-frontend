@@ -58,7 +58,7 @@ const NonHealthLogin = () => {
 
         setSuccess('User logged in successfully')
 
-        window.location.href = '/non-health-dashboard'
+         window.location.href = "/stakeholder/dashboard";
       } else {
         console.error('Unexpected response format:', response.data)
         setError('No token received from the server.')

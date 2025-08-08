@@ -63,7 +63,7 @@ const Login = () => {
         setSuccess("User logged in successfully");
 
         // Redirect based on user role
-        window.location.href = "/health-dashboard";
+        window.location.href = "/stakeholder/dashboard";
       } else {
         console.error("Unexpected response format:", response.data);
         setError("No token received from the server.");
