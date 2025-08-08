@@ -40,7 +40,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const loginEndpoint = "https://dohs.onrender.com/api/v1/health/login";
+      const loginEndpoint = "https://backend.onehealth-wwrg.com/api/v1/health/login";
 
       const response = await axios.post(loginEndpoint, formData);
 

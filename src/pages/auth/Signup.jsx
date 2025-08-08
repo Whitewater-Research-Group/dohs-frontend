@@ -154,7 +154,7 @@ const SignUp = () => {
 
       // Send data to the backend
       const response = await axios.post(
-        "https://dohs.onrender.com/api/v1/health/signup",
+        "https://backend.onehealth-wwrg.com/api/v1/health/signup",
         submitData
       );
 
