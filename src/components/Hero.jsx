@@ -5,7 +5,7 @@ import rightArrow from '../assets/right_arrow.png';
 
 const Hero = () => {
     return (
-        <section className="bg-cover bg-center p-10 md:p-0 h-screen flex flex-col m-0 md:flex-row items-center mt-20 w-full right-0" style={{ backgroundImage: `url(${backgroundImage})` }}>
+        <section className="bg-cover bg-center p-10 md:p-0 h-screen flex flex-col m-0 md:flex-row items-center  w-full right-0" style={{ backgroundImage: `url(${backgroundImage})` }}>
             <div className="md:ml-52 text-white">
                 <h1 className="font-primary mt-20 md:mt-0 text-4xl md:text-6xl md:w-1/2 font-bold mb-6 leading-10">Integrated Health Surveillance for a <span className='font-cursive'>Safer</span> World</h1><br />
 
