@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Bell,
   Search,
@@ -17,6 +17,35 @@ import {
 import avatarImage from "../../assets/avatar.png";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Get user data from localStorage
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+  }, []);
+
+  const getUserDisplayName = () => {
+    if (!user) return "User";
+
+    // Check if user has first_name and last_name
+    if (user.first_name && user.last_name) {
+      return `${user.first_name} ${user.last_name}`;
+    }
+    // Fallback to email or just "User"
+    if (user.email) {
+      return user.email.split("@")[0];
+    }
+    return "User";
+  };
+
   const handleLogout = () => {
     // Clear localStorage
     localStorage.removeItem("authToken");
@@ -67,7 +96,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <img src={avatarImage} alt="Avatar" />
           </div>
           <div className={`ml-3 ${isOpen ? "block" : "hidden"} `}>
-            <p className="font-primary font-normal text-xs">Dr. A. Solomon</p>
+            <p className="font-primary font-normal text-xs">
+              {getUserDisplayName()}
+            </p>
           </div>
         </div>
         <div className="w-48 bg-white p-4">
