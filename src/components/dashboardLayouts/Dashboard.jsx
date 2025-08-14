@@ -12,10 +12,19 @@ import {
   AlertTriangle,
   MapPin,
   Biohazard,
+  Lock,
 } from "lucide-react";
 import avatarImage from "../../assets/avatar.png";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    
+    // Redirect to login page
+    window.location.href = "/login";
+  };
   const menuItems = [
     { title: "Overview", icon: BarChart2, path: "/stakeholder/dashboard" },
     {
@@ -102,7 +111,16 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       </nav>
 
       <div className="absolute bottom-0 w-full p-4 border-t">
+        <a
+          href="/change-password"
+          className="flex items-center p-3 w-full rounded-lg hover:bg-gray-100 mb-2"
+          aria-label="Change Password"
+        >
+          <Lock className="w-5 h-5" />
+          <span className={`ml-3 ${isOpen ? "block" : "hidden"}`}>Change Password</span>
+        </a>
         <button
+          onClick={handleLogout}
           className="flex items-center p-3 w-full rounded-lg hover:bg-gray-100"
           aria-label="Log Out"
         >
@@ -114,29 +132,45 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   );
 };
 
-const Header = ({ toggleNotifications }) => (
-  <header className="h-16 bg-white shadow-sm fixed top-0 right-0 left-64 px-6 flex items-center justify-between">
-    <div className="relative w-96">
-      <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
-      <input
-        type="text"
-        placeholder="Search..."
-        className="w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:border-blue-500"
-        aria-label="Search"
-      />
-    </div>
-    <div className="flex items-center gap-4">
-      <button
-        onClick={toggleNotifications}
-        className="p-2 rounded-lg hover:bg-gray-100 relative"
-        aria-label="Toggle Notifications"
-      >
-        <Bell className="w-5 h-5" />
-        <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-      </button>
-    </div>
-  </header>
-);
+const Header = ({ toggleNotifications }) => {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  
+  return (
+    <header className="h-16 bg-white shadow-sm fixed top-0 right-0 left-64 px-6 flex items-center justify-between">
+      <div className="relative w-96">
+        <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
+        <input
+          type="text"
+          placeholder="Search..."
+          className="w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:border-blue-500"
+          aria-label="Search"
+        />
+      </div>
+      <div className="flex items-center gap-4">
+        {user.first_name && (
+          <div className="flex items-center gap-2">
+            <img
+              src={avatarImage}
+              alt="User Avatar"
+              className="w-8 h-8 rounded-full"
+            />
+            <span className="text-sm text-gray-700">
+              {user.first_name} {user.last_name}
+            </span>
+          </div>
+        )}
+        <button
+          onClick={toggleNotifications}
+          className="p-2 rounded-lg hover:bg-gray-100 relative"
+          aria-label="Toggle Notifications"
+        >
+          <Bell className="w-5 h-5" />
+          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+        </button>
+      </div>
+    </header>
+  );
+};
 
 const NotificationsPanel = ({ isOpen, onClose }) => {
   const notifications = [

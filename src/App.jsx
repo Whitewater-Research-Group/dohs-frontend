@@ -7,6 +7,8 @@ import NonHealthLogin from "./pages/auth/Login-nonmed";
 import SelectRole from "./pages/auth/SelectRole";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+import ChangePassword from "./pages/auth/ChangePassword";
+import ProtectedRoute from "./components/ProtectedRoute";
 import NonHealthDashboard from "./pages/dashboard/NonHealthDashboard";
 import HealthDashboard from "./pages/dashboard/NonHealthDashboard";
 import Home from "./pages/home/Home";
@@ -32,6 +34,14 @@ function App() {
         <Route path="/login" element={<SelectRole />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route 
+          path="/change-password" 
+          element={
+            <ProtectedRoute>
+              <ChangePassword />
+            </ProtectedRoute>
+          } 
+        />
         <Route path="/non-health-dashboard" element={<NonHealthDashboard />} />
         <Route path="/health-dashboard" element={<HealthDashboard />} />
         <Route path="/" element={<Home />} />
