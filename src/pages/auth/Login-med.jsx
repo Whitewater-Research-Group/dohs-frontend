@@ -40,7 +40,8 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const loginEndpoint = "https://backend.onehealth-wwrg.com/api/v1/health/login";
+      const loginEndpoint =
+        "https://backend.onehealth-wwrg.com/api/v1/health/login";
 
       const response = await axios.post(loginEndpoint, formData);
 
@@ -158,7 +159,9 @@ const Login = () => {
 
               <div className="flex items-center mb-4 mt-4">
                 <Link className="mr-2" to="/forgot-password">
-                  <p className="text-secondary hover:underline">Forgot Password?</p>
+                  <p className="text-secondary hover:underline">
+                    Forgot Password?
+                  </p>
                 </Link>
               </div>
 

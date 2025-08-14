@@ -12,7 +12,7 @@ import axios from "axios";
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const token = searchParams.get('token');
+  const token = searchParams.get("token");
 
   const [formData, setFormData] = useState({
     new_password: "",
@@ -27,10 +27,15 @@ const ResetPassword = () => {
   const [isFormValid, setIsFormValid] = useState(false);
 
   // Password validation regex
-  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\W]{8,}$/;
+  const passwordRegex =
+    /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\W]{8,}$/;
 
   const [errors, setErrors] = useState({
-    new_password: { message: "Password must be at least 8 characters long and contain an uppercase letter, a number, and a special character", valid: false },
+    new_password: {
+      message:
+        "Password must be at least 8 characters long and contain an uppercase letter, a number, and a special character",
+      valid: false,
+    },
     confirmPassword: { message: "Passwords do not match", valid: false },
   });
 
@@ -38,12 +43,15 @@ const ResetPassword = () => {
   const validateForm = () => {
     let formErrors = {
       new_password: {
-        message: "Password must be at least 8 characters long and contain an uppercase letter, a number, and a special character",
+        message:
+          "Password must be at least 8 characters long and contain an uppercase letter, a number, and a special character",
         valid: passwordRegex.test(formData.new_password),
       },
       confirmPassword: {
         message: "Passwords must match",
-        valid: formData.new_password === formData.confirmPassword && formData.confirmPassword !== "",
+        valid:
+          formData.new_password === formData.confirmPassword &&
+          formData.confirmPassword !== "",
       },
     };
     setErrors(formErrors);
@@ -57,7 +65,9 @@ const ResetPassword = () => {
   useEffect(() => {
     // Check if token exists, if not redirect to login
     if (!token) {
-      setError("Invalid or missing reset token. Please request a new password reset.");
+      setError(
+        "Invalid or missing reset token. Please request a new password reset."
+      );
     }
   }, [token]);
 
@@ -76,7 +86,9 @@ const ResetPassword = () => {
     setSuccess("");
 
     if (!token) {
-      setError("Invalid or missing reset token. Please request a new password reset.");
+      setError(
+        "Invalid or missing reset token. Please request a new password reset."
+      );
       return;
     }
 
@@ -98,7 +110,7 @@ const ResetPassword = () => {
 
       if (response.status >= 200 && response.status < 300) {
         setSuccess("Password reset successful! Redirecting to login...");
-        
+
         // Clear form
         setFormData({
           new_password: "",
@@ -117,10 +129,15 @@ const ResetPassword = () => {
         // Handle validation errors
         if (error.response.data.detail) {
           const validationErrors = error.response.data.detail;
-          const errorMessage = validationErrors.map(err => err.msg).join(", ");
+          const errorMessage = validationErrors
+            .map((err) => err.msg)
+            .join(", ");
           setError(errorMessage);
         } else {
-          const errorMessage = error.response.data.msg || error.response.data.message || "Password reset failed";
+          const errorMessage =
+            error.response.data.msg ||
+            error.response.data.message ||
+            "Password reset failed";
           setError(errorMessage);
         }
       } else if (error.request) {
@@ -170,10 +187,11 @@ const ResetPassword = () => {
             <h2 className="text-2xl md:text-3xl font-semibold text-secondary mb-4">
               Reset Password
             </h2>
-            
+
             {!token && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                Invalid or missing reset token. Please request a new password reset.
+                Invalid or missing reset token. Please request a new password
+                reset.
               </div>
             )}
 
@@ -236,14 +254,16 @@ const ResetPassword = () => {
 
               {/* Validation messages */}
               <div className="validation-messages mt-4">
-                {Object.entries(errors).map(([field, { message, valid }], index) => (
-                  <div key={index} className="flex items-center mb-2 text-xs">
-                    {renderValidationIcon(valid)}
-                    <span className={valid ? "text-darkGreen" : "text-red"}>
-                      {message}
-                    </span>
-                  </div>
-                ))}
+                {Object.entries(errors).map(
+                  ([field, { message, valid }], index) => (
+                    <div key={index} className="flex items-center mb-2 text-xs">
+                      {renderValidationIcon(valid)}
+                      <span className={valid ? "text-darkGreen" : "text-red"}>
+                        {message}
+                      </span>
+                    </div>
+                  )
+                )}
               </div>
 
               {error && <p className="text-red-500 text-center">{error}</p>}
