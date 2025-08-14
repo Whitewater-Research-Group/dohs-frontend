@@ -34,13 +34,13 @@ function App() {
         <Route path="/login" element={<SelectRole />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route 
-          path="/change-password" 
+        <Route
+          path="/change-password"
           element={
             <ProtectedRoute>
               <ChangePassword />
             </ProtectedRoute>
-          } 
+          }
         />
         <Route path="/non-health-dashboard" element={<NonHealthDashboard />} />
         <Route path="/health-dashboard" element={<HealthDashboard />} />

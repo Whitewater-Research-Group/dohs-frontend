@@ -21,7 +21,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     // Clear localStorage
     localStorage.removeItem("authToken");
     localStorage.removeItem("user");
-    
+
     // Redirect to login page
     window.location.href = "/login";
   };
@@ -117,7 +117,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           aria-label="Change Password"
         >
           <Lock className="w-5 h-5" />
-          <span className={`ml-3 ${isOpen ? "block" : "hidden"}`}>Change Password</span>
+          <span className={`ml-3 ${isOpen ? "block" : "hidden"}`}>
+            Change Password
+          </span>
         </a>
         <button
           onClick={handleLogout}
@@ -134,7 +136,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
 const Header = ({ toggleNotifications }) => {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
-  
+
   return (
     <header className="h-16 bg-white shadow-sm fixed top-0 right-0 left-64 px-6 flex items-center justify-between">
       <div className="relative w-96">

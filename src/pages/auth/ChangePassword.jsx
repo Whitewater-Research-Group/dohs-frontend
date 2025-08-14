@@ -27,11 +27,16 @@ const ChangePassword = () => {
   const [isFormValid, setIsFormValid] = useState(false);
 
   // Password validation regex
-  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\W]{8,}$/;
+  const passwordRegex =
+    /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[A-Za-z\d\W]{8,}$/;
 
   const [errors, setErrors] = useState({
     old_password: { message: "Current password is required", valid: false },
-    new_password: { message: "Password must be at least 8 characters long and contain an uppercase letter, a number, and a special character", valid: false },
+    new_password: {
+      message:
+        "Password must be at least 8 characters long and contain an uppercase letter, a number, and a special character",
+      valid: false,
+    },
     confirmPassword: { message: "Passwords do not match", valid: false },
   });
 
@@ -52,12 +57,15 @@ const ChangePassword = () => {
         valid: !!formData.old_password,
       },
       new_password: {
-        message: "Password must be at least 8 characters long and contain an uppercase letter, a number, and a special character",
+        message:
+          "Password must be at least 8 characters long and contain an uppercase letter, a number, and a special character",
         valid: passwordRegex.test(formData.new_password),
       },
       confirmPassword: {
         message: "Passwords must match",
-        valid: formData.new_password === formData.confirmPassword && formData.confirmPassword !== "",
+        valid:
+          formData.new_password === formData.confirmPassword &&
+          formData.confirmPassword !== "",
       },
     };
     setErrors(formErrors);
@@ -91,7 +99,7 @@ const ChangePassword = () => {
 
     try {
       const token = localStorage.getItem("authToken");
-      
+
       if (!token) {
         setError("You must be logged in to change your password.");
         navigate("/login");
@@ -113,8 +121,10 @@ const ChangePassword = () => {
       );
 
       if (response.status >= 200 && response.status < 300) {
-        setSuccess("Password changed successfully! You can now use your new password.");
-        
+        setSuccess(
+          "Password changed successfully! You can now use your new password."
+        );
+
         // Clear form
         setFormData({
           old_password: "",
@@ -134,10 +144,15 @@ const ChangePassword = () => {
         // Handle validation errors
         if (error.response.data.detail) {
           const validationErrors = error.response.data.detail;
-          const errorMessage = validationErrors.map(err => err.msg).join(", ");
+          const errorMessage = validationErrors
+            .map((err) => err.msg)
+            .join(", ");
           setError(errorMessage);
         } else {
-          const errorMessage = error.response.data.msg || error.response.data.message || "Failed to change password";
+          const errorMessage =
+            error.response.data.msg ||
+            error.response.data.message ||
+            "Failed to change password";
           setError(errorMessage);
         }
       } else if (error.request) {
@@ -191,7 +206,7 @@ const ChangePassword = () => {
             <h2 className="text-2xl md:text-3xl font-semibold text-secondary mb-4">
               Change Password
             </h2>
-            
+
             <p className="text-gray-600 mb-4">
               Enter your current password and choose a new secure password.
             </p>
@@ -280,14 +295,16 @@ const ChangePassword = () => {
 
               {/* Validation messages */}
               <div className="validation-messages mt-4">
-                {Object.entries(errors).map(([field, { message, valid }], index) => (
-                  <div key={index} className="flex items-center mb-2 text-xs">
-                    {renderValidationIcon(valid)}
-                    <span className={valid ? "text-darkGreen" : "text-red"}>
-                      {message}
-                    </span>
-                  </div>
-                ))}
+                {Object.entries(errors).map(
+                  ([field, { message, valid }], index) => (
+                    <div key={index} className="flex items-center mb-2 text-xs">
+                      {renderValidationIcon(valid)}
+                      <span className={valid ? "text-darkGreen" : "text-red"}>
+                        {message}
+                      </span>
+                    </div>
+                  )
+                )}
               </div>
 
               {error && <p className="text-red-500 text-center">{error}</p>}
