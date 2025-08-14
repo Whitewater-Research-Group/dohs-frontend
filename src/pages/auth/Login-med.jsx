@@ -157,9 +157,9 @@ const Login = () => {
               </div>
 
               <div className="flex items-center mb-4 mt-4">
-                <a className="mr-2" href="/reset">
-                  <p>Forgot Password?</p>
-                </a>
+                <Link className="mr-2" to="/forgot-password">
+                  <p className="text-secondary hover:underline">Forgot Password?</p>
+                </Link>
               </div>
 
               {Error && <p className="text-danger text-center">{Error}</p>}
