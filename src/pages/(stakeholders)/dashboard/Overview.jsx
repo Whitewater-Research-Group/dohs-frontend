@@ -32,13 +32,13 @@ function OverviewDashboard() {
     "Dengue",
     "Monkey Pox",
   ];
-  const devices = [
-    { name: "Linux", value: 12000 },
-    { name: "Mac", value: 20000 },
-    { name: "iOS", value: 15000 },
-    { name: "Windows", value: 25000 },
-    { name: "Android", value: 10000 },
-    { name: "Other", value: 18000 },
+  const states = [
+    { name: "Lagos", value: 25000 },
+    { name: "Kano", value: 20000 },
+    { name: "Abuja", value: 18000 },
+    { name: "Rivers", value: 15000 },
+    { name: "Kaduna", value: 12000 },
+    { name: "Ogun", value: 10000 },
   ];
   const locations = [
     { name: "North", value: 38.6 },
@@ -153,27 +153,27 @@ function OverviewDashboard() {
                 </ResponsiveContainer>
               </div>
             </div>
-            {/* Device and Location Charts */}
+            {/* State and Location Charts */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Reports by Device */}
+              {/* Reports by States */}
               <div className="bg-white rounded-xl shadow p-6">
-                <h3 className="font-semibold mb-2">Reports by Device</h3>
+                <h3 className="font-semibold mb-2">Reports by States</h3>
                 <div className="flex items-end gap-2 h-32">
-                  {devices.map((device) => (
+                  {states.map((state) => (
                     <div
-                      key={device.name}
+                      key={state.name}
                       className="flex flex-col items-center w-8"
                     >
                       <div
                         className="bg-blue-400 rounded-t"
                         style={{
-                          height: `${device.value / 300}px`,
+                          height: `${state.value / 300}px`,
                           minHeight: "20px",
                           width: "100%",
                         }}
                       ></div>
                       <span className="text-xs mt-1 text-gray-500">
-                        {device.name}
+                        {state.name}
                       </span>
                     </div>
                   ))}
