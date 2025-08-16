@@ -2,8 +2,9 @@
 //import React from 'react'
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import SignUp from "./pages/auth/Signup";
+import SignUpNonHealth from "./pages/auth/Signup-nonhealth";
 import Login from "./pages/auth/Login-med";
-import NonHealthLogin from "./pages/auth/Login-nonmed";
+import NonHealthLogin from "./pages/auth/Login-nonhealth";
 import SelectRole from "./pages/auth/SelectRole";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
@@ -29,6 +30,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/signup-non-health" element={<SignUpNonHealth />} />
         <Route path="/health-login" element={<Login />} />
         <Route path="/non-health-login" element={<NonHealthLogin />} />
         <Route path="/login" element={<SelectRole />} />
