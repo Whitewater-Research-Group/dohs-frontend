@@ -1,9 +1,9 @@
 // src/App.jsx
 //import React from 'react'
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import SignUp from "./pages/auth/Signup";
+import SignUp from "./pages/auth/Signup-health";
 import SignUpNonHealth from "./pages/auth/Signup-nonhealth";
-import Login from "./pages/auth/Login-med";
+import Login from "./pages/auth/Login-health";
 import NonHealthLogin from "./pages/auth/Login-nonhealth";
 import SelectRole from "./pages/auth/SelectRole";
 import ForgotPassword from "./pages/auth/ForgotPassword";
