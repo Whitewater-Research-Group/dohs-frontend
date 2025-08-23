@@ -13,6 +13,8 @@ import {
   MapPin,
   Biohazard,
   Lock,
+  Dog,
+  Leaf,
 } from "lucide-react";
 import avatarImage from "../../assets/avatar.png";
 
@@ -61,14 +63,28 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       icon: MapPin,
       path: "/stakeholder/dashboard/map",
     },
-    { title: "Cases", icon: Biohazard, path: "/stakeholder/dashboard/cases" },
-    { title: "Reports", icon: FileText, path: "/reports" },
-    { title: "Projects", icon: Folder, path: "/projects" },
     {
-      title: "Epidemic Reports",
-      icon: AlertTriangle,
-      path: "/epidemic-reports",
+      title: "Human Cases",
+      icon: Biohazard,
+      path: "/stakeholder/dashboard/cases",
     },
+    {
+      title: "Animal Cases",
+      icon: Dog,
+      path: "/stakeholder/dashboard/animal-cases",
+    },
+    {
+      title: "Environmental Cases",
+      icon: Leaf,
+      path: "/stakeholder/dashboard/environmental-cases",
+    },
+    { title: "Reports", icon: FileText, path: "/reports" },
+    // { title: "Projects", icon: Folder, path: "/projects" },
+    // {
+    //   title: "Epidemic Reports",
+    //   icon: AlertTriangle,
+    //   path: "/epidemic-reports",
+    // },
   ];
 
   return (

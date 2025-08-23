@@ -537,7 +537,7 @@ function Cases() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-1">
-              Case Directory
+              Human Cases Directory
             </h2>
             <p className="text-sm text-gray-600">
               Showing {filteredCases.length} of {mockCases.length} cases

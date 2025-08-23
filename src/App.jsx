@@ -23,7 +23,9 @@ import Stakeholder from "./pages/stakeholder/Stakeholder";
 import OverviewDashboard from "./pages/(stakeholders)/dashboard/Overview";
 import "./App.css";
 import InteractiveMap from "./pages/(stakeholders)/dashboard/Gis";
-import Cases from "./pages/(stakeholders)/dashboard/Cases";
+import Cases from "./pages/(stakeholders)/dashboard/HumanCases";
+import AnimalCases from "./pages/(stakeholders)/dashboard/AnimalCases";
+import EnvironmentalCases from "./pages/(stakeholders)/dashboard/EnvironmentalCases";
 
 function App() {
   return (
@@ -61,6 +63,14 @@ function App() {
         <Route path="/stakeholder/dashboard" element={<OverviewDashboard />} />
         <Route path="/stakeholder/dashboard/map" element={<InteractiveMap />} />
         <Route path="/stakeholder/dashboard/cases" element={<Cases />} />
+        <Route
+          path="/stakeholder/dashboard/animal-cases"
+          element={<AnimalCases />}
+        />
+        <Route
+          path="/stakeholder/dashboard/environmental-cases"
+          element={<EnvironmentalCases />}
+        />
       </Routes>
     </Router>
   );
