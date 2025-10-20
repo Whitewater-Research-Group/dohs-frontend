@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Navbar from "../../../components/Navbar";
 import DashboardLayout from "../../../components/dashboardLayouts/Dashboard";
+import axios from "axios";
 import {
   MapContainer,
   TileLayer,
@@ -30,56 +31,7 @@ import {
 } from "lucide-react";
 
 // Multi-layer case data for One Health surveillance
-const humanCasesData = [
-  {
-    id: 1,
-    name: "Lagos COVID-19 Outbreak",
-    lat: 6.5244,
-    lon: 3.3792,
-    cases: 1250,
-    disease: "COVID-19",
-    severity: "high",
-    type: "human",
-    reportedDate: "2024-08-15",
-    status: "active",
-  },
-  {
-    id: 2,
-    name: "Abuja Ebola Case",
-    lat: 9.0578,
-    lon: 7.4951,
-    cases: 8,
-    disease: "Ebola",
-    severity: "critical",
-    type: "human",
-    reportedDate: "2024-08-20",
-    status: "contained",
-  },
-  {
-    id: 3,
-    name: "Kano Measles Outbreak",
-    lat: 12.0022,
-    lon: 8.5919,
-    cases: 350,
-    disease: "Measles",
-    severity: "medium",
-    type: "human",
-    reportedDate: "2024-08-10",
-    status: "active",
-  },
-  {
-    id: 4,
-    name: "Port Harcourt Malaria",
-    lat: 4.8156,
-    lon: 7.0498,
-    cases: 890,
-    disease: "Malaria",
-    severity: "medium",
-    type: "human",
-    reportedDate: "2024-08-12",
-    status: "monitoring",
-  },
-];
+// Human cases will be fetched from API
 
 const animalCasesData = [
   {
@@ -199,15 +151,11 @@ const environmentalCasesData = [
   },
 ];
 
-// Combine all case data
-const allCasesData = [
-  ...humanCasesData,
-  ...animalCasesData,
-  ...environmentalCasesData,
-];
-
 function InteractiveMap() {
   const [healthData, setHealthData] = useState([]);
+  const [humanCasesData, setHumanCasesData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [stateColor, setStateColor] = useState("#90ee90");
   const [showControls, setShowControls] = useState(true);
   const [activeFilters, setActiveFilters] = useState({
@@ -224,9 +172,122 @@ function InteractiveMap() {
 
   const mapRef = useRef(null);
 
+  // Fetch human cases from API
+  const fetchHumanCases = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const token = localStorage.getItem("authToken");
+
+      const response = await axios.get(
+        "https://backend.onehealth-wwrg.com/api/v1/reports/health",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          params: {
+            page: 1,
+            page_size: 100,
+            sort_by: "created_at",
+            sort_order: "desc",
+          },
+        }
+      );
+
+      console.log("Human cases API response:", response.data);
+
+      if (response.data && response.data.items) {
+        // Transform API data to match expected structure
+        const transformedHumanCases = response.data.items.map(
+          (item, index) => ({
+            id: item.id || index + 1,
+            name: `${item.case_id} - ${item.disease}`,
+            lat: item.latitude,
+            lon: item.longitude,
+            cases: 1, // Each item is one case
+            disease: item.disease,
+            severity: getSeverityFromClassification(item.classification),
+            type: "human",
+            reportedDate: item.reported_at
+              ? new Date(item.reported_at).toISOString().split("T")[0]
+              : null,
+            status: getStatusFromOutcome(item.outcome),
+            // Additional fields from API
+            caseId: item.case_id,
+            personID: item.personID,
+            age: item.age,
+            sex: item.sex,
+            state: item.state,
+            lga: item.lga,
+            region: item.region,
+            healthFacility: item.health_facility,
+            reportingSource: item.reporting_source,
+            symptoms: item.symptoms,
+            riskFactors: item.risk_factors,
+            classification: item.classification,
+            outcome: item.outcome,
+            dateOfOnset: item.date_of_onset,
+            dateOfConfirmation: item.date_of_confirmation,
+            occupation: item.occupation,
+          })
+        );
+
+        setHumanCasesData(transformedHumanCases);
+        console.log("Transformed human cases:", transformedHumanCases);
+      } else {
+        setHumanCasesData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching human cases:", error);
+      setError(error.response?.data?.message || "Failed to fetch human cases");
+      setHumanCasesData([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Helper function to map classification to severity
+  const getSeverityFromClassification = (classification) => {
+    switch (classification?.toLowerCase()) {
+      case "confirmed":
+        return "critical";
+      case "probable":
+        return "high";
+      case "suspect":
+        return "medium";
+      default:
+        return "low";
+    }
+  };
+
+  // Helper function to map outcome to status
+  const getStatusFromOutcome = (outcome) => {
+    switch (outcome?.toLowerCase()) {
+      case "deceased":
+        return "critical";
+      case "recovered":
+        return "contained";
+      case "under treatment":
+        return "active";
+      default:
+        return "monitoring";
+    }
+  };
+
   useEffect(() => {
-    setHealthData(allCasesData);
+    fetchHumanCases();
   }, []);
+
+  // Combine all case data when human cases are loaded
+  useEffect(() => {
+    const allCasesData = [
+      ...humanCasesData,
+      ...animalCasesData,
+      ...environmentalCasesData,
+    ];
+    setHealthData(allCasesData);
+  }, [humanCasesData]);
 
   // Filter data based on active filters and search
   const filteredData = healthData.filter((item) => {
@@ -364,6 +425,46 @@ function InteractiveMap() {
     };
   };
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center h-full">
+          <RefreshCw className="w-8 h-8 animate-spin text-blue-600 mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Loading Map Data
+          </h2>
+          <p className="text-gray-600">
+            Fetching real-time health surveillance data...
+          </p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center h-full">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
+            <h2 className="text-xl font-semibold text-red-900 mb-2">
+              Error Loading Data
+            </h2>
+            <p className="text-red-700 mb-4">{error}</p>
+            <button
+              onClick={fetchHumanCases}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Retry
+            </button>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
       <div className="flex flex-col h-full">
@@ -379,6 +480,9 @@ function InteractiveMap() {
                   </div>
                   <div className="text-xl font-bold text-blue-800">
                     {stats.total}
+                  </div>
+                  <div className="text-xs text-blue-500 mt-1">
+                    {humanCasesData.length > 0 ? "Live Data" : "No Data"}
                   </div>
                 </div>
                 <div className="bg-red-50 px-4 py-2 rounded-lg flex items-center gap-2">
@@ -424,13 +528,26 @@ function InteractiveMap() {
                 </div>
               </div>
 
-              <button
-                onClick={() => setShowControls(false)}
-                className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                <EyeOff className="w-4 h-4" />
-                Hide Panel
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={fetchHumanCases}
+                  className="flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                  title="Refresh Human Cases Data"
+                  disabled={isLoading}
+                >
+                  <RefreshCw
+                    className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
+                  />
+                  Refresh Data
+                </button>
+                <button
+                  onClick={() => setShowControls(false)}
+                  className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  <EyeOff className="w-4 h-4" />
+                  Hide Panel
+                </button>
+              </div>
             </div>
 
             {/* Filters and Search */}
