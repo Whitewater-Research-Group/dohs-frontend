@@ -20,6 +20,7 @@ import avatarImage from "../../assets/avatar.png";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [user, setUser] = useState(null);
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
   useEffect(() => {
     // Get user data from localStorage
@@ -32,6 +33,18 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         console.error("Error parsing user data:", error);
       }
     }
+
+    // Update current path when it changes
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
+    // Listen for browser back/forward buttons
+    window.addEventListener("popstate", handleLocationChange);
+
+    return () => {
+      window.removeEventListener("popstate", handleLocationChange);
+    };
   }, []);
 
   const getUserDisplayName = () => {
@@ -46,6 +59,24 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       return user.email.split("@")[0];
     }
     return "User";
+  };
+
+  const isActivePath = (itemPath) => {
+    // Exact match for overview
+    if (
+      itemPath === "/stakeholder/dashboard" &&
+      currentPath === "/stakeholder/dashboard"
+    ) {
+      return true;
+    }
+    // For other paths, check if current path starts with the item path
+    if (
+      itemPath !== "/stakeholder/dashboard" &&
+      currentPath.startsWith(itemPath)
+    ) {
+      return true;
+    }
+    return false;
   };
 
   const handleLogout = () => {
@@ -143,34 +174,59 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           {/* <span className="hover:text-gray-900 cursor-pointer">Favorites</span>
           <span className="hover:text-gray-900 cursor-pointer">Recently</span> */}
         </div>
-        {menuItems.map((item, index) => (
-          <a
-            key={index}
-            href={item.path}
-            className="flex items-center p-3 mb-2 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            <item.icon className="w-5 h-5" />
-            <span className={`ml-3 ${isOpen ? "block" : "hidden"}`}>
-              {item.title}
-            </span>
-          </a>
-        ))}
+        {menuItems.map((item, index) => {
+          const isActive = isActivePath(item.path);
+          return (
+            <a
+              key={index}
+              href={item.path}
+              className={`flex items-center p-3 mb-2 rounded-lg transition-colors ${
+                isActive
+                  ? "bg-blue-100 text-blue-700 border-r-4 border-blue-700"
+                  : "hover:bg-gray-100 text-gray-700"
+              }`}
+            >
+              <item.icon
+                className={`w-5 h-5 ${isActive ? "text-blue-700" : ""}`}
+              />
+              <span
+                className={`ml-3 ${isOpen ? "block" : "hidden"} ${
+                  isActive ? "font-medium" : ""
+                }`}
+              >
+                {item.title}
+              </span>
+            </a>
+          );
+        })}
       </nav>
 
       <div className="absolute bottom-0 w-full p-4 border-t">
         <a
           href="/change-password"
-          className="flex items-center p-3 w-full rounded-lg hover:bg-gray-100 mb-2"
+          className={`flex items-center p-3 w-full rounded-lg mb-2 transition-colors ${
+            currentPath === "/change-password"
+              ? "bg-blue-100 text-blue-700 border-r-4 border-blue-700"
+              : "hover:bg-gray-100 text-gray-700"
+          }`}
           aria-label="Change Password"
         >
-          <Lock className="w-5 h-5" />
-          <span className={`ml-3 ${isOpen ? "block" : "hidden"}`}>
+          <Lock
+            className={`w-5 h-5 ${
+              currentPath === "/change-password" ? "text-blue-700" : ""
+            }`}
+          />
+          <span
+            className={`ml-3 ${isOpen ? "block" : "hidden"} ${
+              currentPath === "/change-password" ? "font-medium" : ""
+            }`}
+          >
             Change Password
           </span>
         </a>
         <button
           onClick={handleLogout}
-          className="flex items-center p-3 w-full rounded-lg hover:bg-gray-100"
+          className="flex items-center p-3 w-full rounded-lg hover:bg-gray-100 text-gray-700"
           aria-label="Log Out"
         >
           <LogOut className="w-5 h-5" />
