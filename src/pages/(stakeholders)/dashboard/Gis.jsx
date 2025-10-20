@@ -12,63 +12,253 @@ import {
   LayerGroup,
   useMap,
   Tooltip,
+  Circle,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import nigeriaGeoJson from "../../../geodata.json";
+import {
+  Search,
+  Filter,
+  RefreshCw,
+  Users,
+  PawPrint,
+  Leaf,
+  BarChart3,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 
-const sampleHealthData = [
+// Multi-layer case data for One Health surveillance
+const humanCasesData = [
   {
     id: 1,
-    name: "Lagos",
+    name: "Lagos COVID-19 Outbreak",
     lat: 6.5244,
     lon: 3.3792,
-    cases: 200,
+    cases: 1250,
     disease: "COVID-19",
+    severity: "high",
+    type: "human",
+    reportedDate: "2024-08-15",
+    status: "active",
   },
   {
     id: 2,
-    name: "Abuja",
+    name: "Abuja Ebola Case",
     lat: 9.0578,
     lon: 7.4951,
-    cases: 120,
+    cases: 8,
     disease: "Ebola",
+    severity: "critical",
+    type: "human",
+    reportedDate: "2024-08-20",
+    status: "contained",
   },
   {
     id: 3,
-    name: "Kano",
+    name: "Kano Measles Outbreak",
     lat: 12.0022,
     lon: 8.5919,
-    cases: 90,
+    cases: 350,
     disease: "Measles",
+    severity: "medium",
+    type: "human",
+    reportedDate: "2024-08-10",
+    status: "active",
   },
   {
     id: 4,
-    name: "Port Harcourt",
+    name: "Port Harcourt Malaria",
     lat: 4.8156,
     lon: 7.0498,
-    cases: 60,
-    disease: "COVID-19",
+    cases: 890,
+    disease: "Malaria",
+    severity: "medium",
+    type: "human",
+    reportedDate: "2024-08-12",
+    status: "monitoring",
   },
+];
+
+const animalCasesData = [
   {
     id: 5,
-    name: "Uniben",
-    lat: 6.3998,
-    lon: 5.6099,
-    cases: 1,
-    disease: "Ebola",
+    name: "Green Valley Farm - FMD",
+    lat: 6.6018,
+    lon: 3.3515,
+    cases: 45,
+    disease: "Foot and Mouth Disease",
+    species: "Cattle",
+    severity: "high",
+    type: "animal",
+    farmOwner: "Ahmed Hassan",
+    reportedDate: "2024-08-18",
+    status: "quarantined",
   },
+  {
+    id: 6,
+    name: "Sunrise Poultry - Avian Flu",
+    lat: 7.1475,
+    lon: 3.3619,
+    cases: 2000,
+    disease: "Avian Influenza H5N1",
+    species: "Poultry",
+    severity: "critical",
+    type: "animal",
+    farmOwner: "Grace Adebayo",
+    reportedDate: "2024-08-19",
+    status: "culling",
+  },
+  {
+    id: 7,
+    name: "Northern Livestock - PPR",
+    lat: 11.5804,
+    lon: 8.9971,
+    cases: 120,
+    disease: "Peste des Petits Ruminants",
+    species: "Goats",
+    severity: "medium",
+    type: "animal",
+    farmOwner: "Musa Ibrahim",
+    reportedDate: "2024-08-16",
+    status: "treatment",
+  },
+  {
+    id: 8,
+    name: "Coastal Fish Farm - VHS",
+    lat: 5.2058,
+    lon: 6.7013,
+    cases: 500,
+    disease: "Viral Hemorrhagic Septicemia",
+    species: "Fish",
+    severity: "high",
+    type: "animal",
+    farmOwner: "Johnson Okoro",
+    reportedDate: "2024-08-17",
+    status: "isolation",
+  },
+];
+
+const environmentalCasesData = [
+  {
+    id: 9,
+    name: "Victoria Island Water Contamination",
+    lat: 6.4281,
+    lon: 3.4219,
+    cases: 5000,
+    contaminant: "Lead",
+    incidentType: "Water Contamination",
+    severity: "critical",
+    type: "environmental",
+    affectedRadius: 2000, // meters
+    reportedDate: "2024-08-14",
+    status: "remediation",
+  },
+  {
+    id: 10,
+    name: "Ikeja Industrial Air Pollution",
+    lat: 6.5924,
+    lon: 3.3374,
+    cases: 3200,
+    contaminant: "PM2.5",
+    incidentType: "Air Pollution",
+    severity: "high",
+    type: "environmental",
+    affectedRadius: 1500,
+    reportedDate: "2024-08-13",
+    status: "monitoring",
+  },
+  {
+    id: 11,
+    name: "Niger River Oil Spill",
+    lat: 4.9247,
+    lon: 6.2712,
+    cases: 8000,
+    contaminant: "Crude Oil",
+    incidentType: "Water Body Contamination",
+    severity: "critical",
+    type: "environmental",
+    affectedRadius: 5000,
+    reportedDate: "2024-08-11",
+    status: "cleanup",
+  },
+  {
+    id: 12,
+    name: "Kaduna Soil Contamination",
+    lat: 10.5105,
+    lon: 7.4165,
+    cases: 1200,
+    contaminant: "Heavy Metals",
+    incidentType: "Soil Contamination",
+    severity: "medium",
+    type: "environmental",
+    affectedRadius: 800,
+    reportedDate: "2024-08-09",
+    status: "assessment",
+  },
+];
+
+// Combine all case data
+const allCasesData = [
+  ...humanCasesData,
+  ...animalCasesData,
+  ...environmentalCasesData,
 ];
 
 function InteractiveMap() {
   const [healthData, setHealthData] = useState([]);
   const [stateColor, setStateColor] = useState("#90ee90");
+  const [showControls, setShowControls] = useState(true);
+  const [activeFilters, setActiveFilters] = useState({
+    caseType: "all", // all, human, animal, environmental
+    severity: "all", // all, low, medium, high, critical
+    status: "all", // all, active, contained, monitoring, etc.
+  });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [visibleLayers, setVisibleLayers] = useState({
+    human: true,
+    animal: true,
+    environmental: true,
+  });
 
   const mapRef = useRef(null);
 
   useEffect(() => {
-    setHealthData(sampleHealthData);
+    setHealthData(allCasesData);
   }, []);
+
+  // Filter data based on active filters and search
+  const filteredData = healthData.filter((item) => {
+    const typeMatch =
+      activeFilters.caseType === "all" || item.type === activeFilters.caseType;
+    const severityMatch =
+      activeFilters.severity === "all" ||
+      item.severity === activeFilters.severity;
+    const statusMatch =
+      activeFilters.status === "all" || item.status === activeFilters.status;
+    const searchMatch =
+      !searchTerm ||
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.disease &&
+        item.disease.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (item.contaminant &&
+        item.contaminant.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    return typeMatch && severityMatch && statusMatch && searchMatch;
+  });
+
+  // Calculate statistics
+  const stats = {
+    total: filteredData.length,
+    human: filteredData.filter((item) => item.type === "human").length,
+    animal: filteredData.filter((item) => item.type === "animal").length,
+    environmental: filteredData.filter((item) => item.type === "environmental")
+      .length,
+    critical: filteredData.filter((item) => item.severity === "critical")
+      .length,
+    active: filteredData.filter((item) => item.status === "active").length,
+  };
 
   // const nigeriaBounds = L.geoJSON(nigeriaGeoJson).getBounds();
 
@@ -95,154 +285,636 @@ function InteractiveMap() {
     opacity: 1,
   });
 
-  // Add back custom colored marker icons for each disease
-  const diseaseIcons = {
-    "COVID-19": new L.Icon({
-      iconUrl:
-        "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
+  // Enhanced icon system with case-type specific colors and severity indicators
+  const createCaseIcon = (caseType, severity) => {
+    let baseColor = "blue";
+    let size = [25, 41]; // Default size
+
+    // Primary color based on case type
+    switch (caseType) {
+      case "human":
+        baseColor = "blue";
+        break;
+      case "animal":
+        baseColor = "green";
+        break;
+      case "environmental":
+        baseColor = "violet"; // Using violet for environmental
+        break;
+      default:
+        baseColor = "grey";
+    }
+
+    // Adjust marker size based on severity for additional visual cue
+    switch (severity) {
+      case "critical":
+        size = [35, 51]; // Larger for critical cases
+        break;
+      case "high":
+        size = [30, 46]; // Medium-large for high severity
+        break;
+      case "medium":
+        size = [25, 41]; // Standard size
+        break;
+      case "low":
+        size = [20, 31]; // Smaller for low severity
+        break;
+    }
+
+    return new L.Icon({
+      iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${baseColor}.png`,
+      iconSize: size,
+      iconAnchor: [size[0] / 2, size[1]],
+      popupAnchor: [1, -size[1] + 10],
       shadowUrl:
         "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-      shadowSize: [41, 41],
-    }),
-    Ebola: new L.Icon({
-      iconUrl:
-        "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowUrl:
-        "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-      shadowSize: [41, 41],
-    }),
-    Measles: new L.Icon({
-      iconUrl:
-        "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png",
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowUrl:
-        "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-      shadowSize: [41, 41],
-    }),
-    // Default/other
-    default: new L.Icon({
-      iconUrl:
-        "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowUrl:
-        "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-      shadowSize: [41, 41],
-    }),
+      shadowSize: [size[0] + 16, size[1]],
+    });
+  };
+
+  // Create impact radius circles for environmental cases with case-type specific colors
+  const createImpactCircle = (environmentalCase) => {
+    let color = "#8e44ad"; // Purple for environmental consistency
+    let opacity = 0.3;
+
+    switch (environmentalCase.severity) {
+      case "critical":
+        opacity = 0.5;
+        break;
+      case "high":
+        opacity = 0.4;
+        break;
+      case "medium":
+        opacity = 0.3;
+        break;
+      case "low":
+        opacity = 0.2;
+        break;
+    }
+
+    return {
+      center: [environmentalCase.lat, environmentalCase.lon],
+      radius: environmentalCase.affectedRadius || 1000,
+      pathOptions: {
+        color: color,
+        fillColor: color,
+        fillOpacity: opacity,
+        weight: 3,
+      },
+    };
   };
 
   return (
     <DashboardLayout>
-      <div
-        style={{
-          width: "100%",
-          height: "calc(100vh - 64px)",
-          overflow: "hidden",
-        }}
-      >
-        <MapContainer
-          center={[9.082, 8.6753]} // Nigeria
-          zoom={6}
-          minZoom={5}
-          maxZoom={10}
-          style={{ height: "100%", width: "100%" }}
-          whenCreated={(mapInstance) => {
-            mapRef.current = mapInstance;
-            const bounds = L.geoJSON(nigeriaGeoJson).getBounds();
-            mapInstance.fitBounds(bounds);
+      <div className="flex flex-col h-full">
+        {/* Enhanced Control Panel */}
+        {showControls && (
+          <div className="bg-white shadow-lg border-b border-gray-200 p-4 z-10">
+            {/* Statistics Dashboard */}
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+              <div className="flex gap-4">
+                <div className="bg-blue-50 px-4 py-2 rounded-lg">
+                  <div className="text-sm text-blue-600 font-medium">
+                    Total Cases
+                  </div>
+                  <div className="text-xl font-bold text-blue-800">
+                    {stats.total}
+                  </div>
+                </div>
+                <div className="bg-red-50 px-4 py-2 rounded-lg flex items-center gap-2">
+                  <Users className="w-4 h-4 text-red-600" />
+                  <div>
+                    <div className="text-sm text-red-600 font-medium">
+                      Human
+                    </div>
+                    <div className="text-xl font-bold text-red-800">
+                      {stats.human}
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-green-50 px-4 py-2 rounded-lg flex items-center gap-2">
+                  <PawPrint className="w-4 h-4 text-green-600" />
+                  <div>
+                    <div className="text-sm text-green-600 font-medium">
+                      Animal
+                    </div>
+                    <div className="text-xl font-bold text-green-800">
+                      {stats.animal}
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-purple-50 px-4 py-2 rounded-lg flex items-center gap-2">
+                  <Leaf className="w-4 h-4 text-purple-600" />
+                  <div>
+                    <div className="text-sm text-purple-600 font-medium">
+                      Environmental
+                    </div>
+                    <div className="text-xl font-bold text-purple-800">
+                      {stats.environmental}
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-red-100 px-4 py-2 rounded-lg">
+                  <div className="text-sm text-red-700 font-medium">
+                    Critical
+                  </div>
+                  <div className="text-xl font-bold text-red-900">
+                    {stats.critical}
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowControls(false)}
+                className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                <EyeOff className="w-4 h-4" />
+                Hide Panel
+              </button>
+            </div>
+
+            {/* Filters and Search */}
+            <div className="flex flex-wrap items-center gap-4 mb-4">
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search cases, diseases, contaminants..."
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-80"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+
+              <select
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={activeFilters.caseType}
+                onChange={(e) =>
+                  setActiveFilters((prev) => ({
+                    ...prev,
+                    caseType: e.target.value,
+                  }))
+                }
+              >
+                <option value="all">All Case Types</option>
+                <option value="human">Human Cases</option>
+                <option value="animal">Animal Cases</option>
+                <option value="environmental">Environmental Cases</option>
+              </select>
+
+              <select
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={activeFilters.severity}
+                onChange={(e) =>
+                  setActiveFilters((prev) => ({
+                    ...prev,
+                    severity: e.target.value,
+                  }))
+                }
+              >
+                <option value="all">All Severities</option>
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+
+              <select
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={activeFilters.status}
+                onChange={(e) =>
+                  setActiveFilters((prev) => ({
+                    ...prev,
+                    status: e.target.value,
+                  }))
+                }
+              >
+                <option value="all">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="contained">Contained</option>
+                <option value="monitoring">Monitoring</option>
+                <option value="quarantined">Quarantined</option>
+                <option value="remediation">Remediation</option>
+              </select>
+
+              <button
+                onClick={() => {
+                  setActiveFilters({
+                    caseType: "all",
+                    severity: "all",
+                    status: "all",
+                  });
+                  setSearchTerm("");
+                }}
+                className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Reset
+              </button>
+            </div>
+
+            {/* Layer Visibility Controls */}
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-medium text-gray-700">
+                Visible Layers:
+              </span>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={visibleLayers.human}
+                  onChange={(e) =>
+                    setVisibleLayers((prev) => ({
+                      ...prev,
+                      human: e.target.checked,
+                    }))
+                  }
+                  className="rounded"
+                />
+                <Users className="w-4 h-4 text-red-600" />
+                <span className="text-sm">Human Cases</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={visibleLayers.animal}
+                  onChange={(e) =>
+                    setVisibleLayers((prev) => ({
+                      ...prev,
+                      animal: e.target.checked,
+                    }))
+                  }
+                  className="rounded"
+                />
+                <PawPrint className="w-4 h-4 text-green-600" />
+                <span className="text-sm">Animal Cases</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={visibleLayers.environmental}
+                  onChange={(e) =>
+                    setVisibleLayers((prev) => ({
+                      ...prev,
+                      environmental: e.target.checked,
+                    }))
+                  }
+                  className="rounded"
+                />
+                <Leaf className="w-4 h-4 text-purple-600" />
+                <span className="text-sm">Environmental Cases</span>
+              </label>
+            </div>
+
+            {/* Enhanced Legend */}
+            <div className="mt-4 border-t pt-3 space-y-3">
+              <div className="flex items-center gap-6 text-sm">
+                <div className="font-medium text-gray-700">
+                  Case Type Colors:
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+                  <Users className="w-4 h-4 text-blue-600" />
+                  <span>Human Cases</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                  <PawPrint className="w-4 h-4 text-green-600" />
+                  <span>Animal Cases</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-purple-500 rounded-full"></div>
+                  <Leaf className="w-4 h-4 text-purple-600" />
+                  <span>Environmental Cases</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6 text-sm">
+                <div className="font-medium text-gray-700">
+                  Severity Indicators:
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 border-2 border-gray-400 rounded flex items-center justify-center">
+                    <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+                  </div>
+                  <span>Critical (Large)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
+                  </div>
+                  <span>High (Medium)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 border-2 border-gray-400 rounded flex items-center justify-center">
+                    <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+                  </div>
+                  <span>Medium (Standard)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 border-2 border-gray-400 rounded"></div>
+                  <span>Low (Small)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Show Controls Button */}
+        {!showControls && (
+          <button
+            onClick={() => setShowControls(true)}
+            className="absolute top-4 left-4 z-[1000] flex items-center gap-2 px-3 py-2 bg-white shadow-lg rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+          >
+            <Eye className="w-4 h-4" />
+            Show Controls
+          </button>
+        )}
+
+        {/* Enhanced Map */}
+        <div
+          style={{
+            width: "100%",
+            height: showControls ? "calc(100vh - 280px)" : "calc(100vh - 64px)",
+            overflow: "hidden",
           }}
         >
-          <LayersControl position="topright">
-            {/* ✅ Base Layer: OpenStreetMap (default) */}
-            <LayersControl.BaseLayer name="OpenStreetMap" checked>
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-            </LayersControl.BaseLayer>
-
-            {/* ✅ Base Layer: Google Satellite */}
-            <LayersControl.BaseLayer name="Google Satellite">
-              <LayerGroup>
+          <MapContainer
+            center={[9.082, 8.6753]}
+            zoom={6}
+            minZoom={5}
+            maxZoom={15}
+            style={{ height: "100%", width: "100%" }}
+            ref={mapRef}
+          >
+            <LayersControl position="topright">
+              {/* Base Layers */}
+              <LayersControl.BaseLayer name="OpenStreetMap" checked>
                 <TileLayer
-                  url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
-                  attribution="&copy; <a href='https://www.google.com/maps'>Google</a>"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
-                <TileLayer
-                  url="https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}" // Labels
+              </LayersControl.BaseLayer>
+
+              <LayersControl.BaseLayer name="Google Satellite">
+                <LayerGroup>
+                  <TileLayer
+                    url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}"
+                    attribution="&copy; <a href='https://www.google.com/maps'>Google</a>"
+                  />
+                  <TileLayer url="https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}" />
+                </LayerGroup>
+              </LayersControl.BaseLayer>
+
+              {/* Nigeria Boundaries */}
+              <LayersControl.Overlay name="Nigeria Boundaries" checked>
+                <GeoJSON
+                  data={nigeriaGeoJson}
+                  style={stateStyle}
+                  onEachFeature={onEachFeature}
                 />
-              </LayerGroup>
-            </LayersControl.BaseLayer>
+              </LayersControl.Overlay>
 
-            {/* ✅ Overlay: Nigeria GeoJSON */}
-            <LayersControl.Overlay name="Nigeria Map" checked>
-              <GeoJSON
-                data={nigeriaGeoJson}
-                style={stateStyle}
-                onEachFeature={onEachFeature}
-              />
-            </LayersControl.Overlay>
+              {/* Human Cases Layer */}
+              <LayersControl.Overlay name="Human Health Cases" checked>
+                <LayerGroup>
+                  {filteredData
+                    .filter(
+                      (item) => item.type === "human" && visibleLayers.human
+                    )
+                    .map((caseData) => (
+                      <Marker
+                        key={caseData.id}
+                        position={[caseData.lat, caseData.lon]}
+                        icon={createCaseIcon(caseData.type, caseData.severity)}
+                      >
+                        <Popup maxWidth={350}>
+                          <div className="p-3">
+                            <h3 className="font-bold text-lg mb-2 text-red-800">
+                              <Users className="w-5 h-5 inline mr-2" />
+                              {caseData.name}
+                            </h3>
+                            <div className="space-y-2 text-sm">
+                              <div>
+                                <strong>Disease:</strong> {caseData.disease}
+                              </div>
+                              <div>
+                                <strong>Cases:</strong>{" "}
+                                {caseData.cases.toLocaleString()}
+                              </div>
+                              <div>
+                                <strong>Severity:</strong>
+                                <span
+                                  className={`ml-1 px-2 py-1 rounded text-xs font-bold ${
+                                    caseData.severity === "critical"
+                                      ? "bg-red-100 text-red-800"
+                                      : caseData.severity === "high"
+                                      ? "bg-orange-100 text-orange-800"
+                                      : caseData.severity === "medium"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-green-100 text-green-800"
+                                  }`}
+                                >
+                                  {caseData.severity.toUpperCase()}
+                                </span>
+                              </div>
+                              <div>
+                                <strong>Status:</strong>
+                                <span className="ml-1 px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                                  {caseData.status.toUpperCase()}
+                                </span>
+                              </div>
+                              <div>
+                                <strong>Reported:</strong>{" "}
+                                {caseData.reportedDate}
+                              </div>
+                              <div className="text-gray-500">
+                                <strong>Coordinates:</strong>{" "}
+                                {caseData.lat.toFixed(4)},{" "}
+                                {caseData.lon.toFixed(4)}
+                              </div>
+                            </div>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    ))}
+                </LayerGroup>
+              </LayersControl.Overlay>
 
-            {/* ✅ Overlay: Health Facilities */}
-            <LayersControl.Overlay name="Health Facilities">
-              <LayerGroup>
-                <Marker
-                  position={[6.5244, 3.3792]}
-                  icon={diseaseIcons["default"]}
-                >
-                  <Popup>Lagos Health Facility</Popup>
-                </Marker>
-              </LayerGroup>
-            </LayersControl.Overlay>
+              {/* Animal Cases Layer */}
+              <LayersControl.Overlay name="Animal Health Cases" checked>
+                <LayerGroup>
+                  {filteredData
+                    .filter(
+                      (item) => item.type === "animal" && visibleLayers.animal
+                    )
+                    .map((caseData) => (
+                      <Marker
+                        key={caseData.id}
+                        position={[caseData.lat, caseData.lon]}
+                        icon={createCaseIcon(caseData.type, caseData.severity)}
+                      >
+                        <Popup maxWidth={350}>
+                          <div className="p-3">
+                            <h3 className="font-bold text-lg mb-2 text-green-800">
+                              <PawPrint className="w-5 h-5 inline mr-2" />
+                              {caseData.name}
+                            </h3>
+                            <div className="space-y-2 text-sm">
+                              <div>
+                                <strong>Disease:</strong> {caseData.disease}
+                              </div>
+                              <div>
+                                <strong>Species:</strong> {caseData.species}
+                              </div>
+                              <div>
+                                <strong>Affected Animals:</strong>{" "}
+                                {caseData.cases.toLocaleString()}
+                              </div>
+                              <div>
+                                <strong>Farm Owner:</strong>{" "}
+                                {caseData.farmOwner}
+                              </div>
+                              <div>
+                                <strong>Severity:</strong>
+                                <span
+                                  className={`ml-1 px-2 py-1 rounded text-xs font-bold ${
+                                    caseData.severity === "critical"
+                                      ? "bg-red-100 text-red-800"
+                                      : caseData.severity === "high"
+                                      ? "bg-orange-100 text-orange-800"
+                                      : caseData.severity === "medium"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-green-100 text-green-800"
+                                  }`}
+                                >
+                                  {caseData.severity.toUpperCase()}
+                                </span>
+                              </div>
+                              <div>
+                                <strong>Status:</strong>
+                                <span className="ml-1 px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                                  {caseData.status.toUpperCase()}
+                                </span>
+                              </div>
+                              <div>
+                                <strong>Reported:</strong>{" "}
+                                {caseData.reportedDate}
+                              </div>
+                              <div className="text-gray-500">
+                                <strong>Coordinates:</strong>{" "}
+                                {caseData.lat.toFixed(4)},{" "}
+                                {caseData.lon.toFixed(4)}
+                              </div>
+                            </div>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    ))}
+                </LayerGroup>
+              </LayersControl.Overlay>
 
-            {/* ✅ Overlay: Disease Outbreaks */}
-            <LayersControl.Overlay name="Disease Outbreaks">
-              <LayerGroup>
-                {healthData.map((location) => (
-                  <Marker
-                    key={location.id}
-                    position={[location.lat, location.lon]}
-                    icon={
-                      diseaseIcons[location.disease] || diseaseIcons["default"]
-                    }
-                  >
-                    <Tooltip
-                      direction="top"
-                      offset={[0, -20]}
-                      opacity={1}
-                      permanent={false}
-                    >
-                      <div>
-                        <strong>{location.name}</strong>
-                        <br />
-                        Disease: {location.disease}
-                        <br />
-                        Cases: {location.cases}
-                        {/* Add more info here if needed */}
-                      </div>
-                    </Tooltip>
-                    <Popup>
-                      <strong>{location.name}</strong>
-                      <br />
-                      Disease: {location.disease}
-                      <br />
-                      Cases: {location.cases}
-                    </Popup>
-                  </Marker>
-                ))}
-              </LayerGroup>
-            </LayersControl.Overlay>
-          </LayersControl>
-        </MapContainer>
+              {/* Environmental Cases Layer with Impact Circles */}
+              <LayersControl.Overlay name="Environmental Cases" checked>
+                <LayerGroup>
+                  {filteredData
+                    .filter(
+                      (item) =>
+                        item.type === "environmental" &&
+                        visibleLayers.environmental
+                    )
+                    .map((caseData) => {
+                      const circleProps = createImpactCircle(caseData);
+                      return (
+                        <React.Fragment key={caseData.id}>
+                          {/* Impact Radius Circle */}
+                          <Circle
+                            center={circleProps.center}
+                            radius={circleProps.radius}
+                            pathOptions={circleProps.pathOptions}
+                          >
+                            <Tooltip>
+                              Impact Radius:{" "}
+                              {(circleProps.radius / 1000).toFixed(1)} km
+                            </Tooltip>
+                          </Circle>
+
+                          {/* Marker */}
+                          <Marker
+                            position={[caseData.lat, caseData.lon]}
+                            icon={createCaseIcon(
+                              caseData.type,
+                              caseData.severity
+                            )}
+                          >
+                            <Popup maxWidth={350}>
+                              <div className="p-3">
+                                <h3 className="font-bold text-lg mb-2 text-purple-800">
+                                  <Leaf className="w-5 h-5 inline mr-2" />
+                                  {caseData.name}
+                                </h3>
+                                <div className="space-y-2 text-sm">
+                                  <div>
+                                    <strong>Incident Type:</strong>{" "}
+                                    {caseData.incidentType}
+                                  </div>
+                                  <div>
+                                    <strong>Contaminant:</strong>{" "}
+                                    {caseData.contaminant}
+                                  </div>
+                                  <div>
+                                    <strong>Affected Population:</strong>{" "}
+                                    {caseData.cases.toLocaleString()}
+                                  </div>
+                                  <div>
+                                    <strong>Impact Radius:</strong>{" "}
+                                    {(caseData.affectedRadius / 1000).toFixed(
+                                      1
+                                    )}{" "}
+                                    km
+                                  </div>
+                                  <div>
+                                    <strong>Severity:</strong>
+                                    <span
+                                      className={`ml-1 px-2 py-1 rounded text-xs font-bold ${
+                                        caseData.severity === "critical"
+                                          ? "bg-red-100 text-red-800"
+                                          : caseData.severity === "high"
+                                          ? "bg-orange-100 text-orange-800"
+                                          : caseData.severity === "medium"
+                                          ? "bg-yellow-100 text-yellow-800"
+                                          : "bg-green-100 text-green-800"
+                                      }`}
+                                    >
+                                      {caseData.severity.toUpperCase()}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <strong>Status:</strong>
+                                    <span className="ml-1 px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                                      {caseData.status.toUpperCase()}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <strong>Reported:</strong>{" "}
+                                    {caseData.reportedDate}
+                                  </div>
+                                  <div className="text-gray-500">
+                                    <strong>Coordinates:</strong>{" "}
+                                    {caseData.lat.toFixed(4)},{" "}
+                                    {caseData.lon.toFixed(4)}
+                                  </div>
+                                </div>
+                              </div>
+                            </Popup>
+                          </Marker>
+                        </React.Fragment>
+                      );
+                    })}
+                </LayerGroup>
+              </LayersControl.Overlay>
+            </LayersControl>
+          </MapContainer>
+        </div>
       </div>
     </DashboardLayout>
   );

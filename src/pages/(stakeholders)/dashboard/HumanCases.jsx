@@ -19,149 +19,6 @@ import {
   Save,
 } from "lucide-react";
 
-const mockCases = [
-  {
-    caseId: "XYILBD",
-    epidNumber: "LOS-ND-25-001",
-    internalToken: "INT-001",
-    disease: "Yellow Fever",
-    diseaseVariant: "Wild Type",
-    caseClassification: "Confirmed case",
-    outcome: "Recovered",
-    investigationStatus: "Investigation done",
-    personId: "SOVGLQ",
-    firstName: "Elliana",
-    lastName: "Johnson",
-    state: "Lagos",
-    lga: "Lagos Island",
-    healthFacility: "Lagos University Teaching Hospital",
-    region: "South West",
-    dateOfOnset: "2025-01-15",
-    dateOfConfirmation: "2025-01-18",
-    reportingSource: "Hospital Report",
-    age: 34,
-    sex: "Female",
-    occupation: "Teacher",
-    symptoms: "Fever, Jaundice, Headache",
-    riskFactors: "Travel to endemic area",
-    category: "High Risk",
-    dateReported: "2025-01-16",
-    contactNumber: "+234-801-234-5678",
-  },
-  {
-    caseId: "SMUIMI",
-    epidNumber: "LOS---25-081",
-    internalToken: "INT-002",
-    disease: "COVID-19",
-    diseaseVariant: "Omicron",
-    caseClassification: "Suspect case",
-    outcome: "No Outcome Yet",
-    investigationStatus: "Investigation pending",
-    personId: "TMWNQS",
-    firstName: "James",
-    lastName: "Adebayo",
-    state: "Lagos",
-    lga: "Ikeja",
-    healthFacility: "General Hospital Ikeja",
-    region: "South West",
-    dateOfOnset: "2025-01-20",
-    dateOfConfirmation: null,
-    reportingSource: "Community Report",
-    age: 28,
-    sex: "Male",
-    occupation: "Engineer",
-    symptoms: "Cough, Fever, Loss of taste",
-    riskFactors: "Close contact with confirmed case",
-    category: "Medium Risk",
-    dateReported: "2025-01-21",
-    contactNumber: "+234-802-345-6789",
-  },
-  {
-    caseId: "UOZL3G",
-    epidNumber: "LOS---25-080",
-    internalToken: "INT-003",
-    disease: "Measles",
-    diseaseVariant: "Wild Type",
-    caseClassification: "Confirmed case",
-    outcome: "Recovered",
-    investigationStatus: "Investigation done",
-    personId: "UGBWTB",
-    firstName: "Kofi",
-    lastName: "Mensah",
-    state: "Ogun",
-    lga: "Abeokuta South",
-    healthFacility: "State Hospital Abeokuta",
-    region: "South West",
-    dateOfOnset: "2025-01-10",
-    dateOfConfirmation: "2025-01-12",
-    reportingSource: "Laboratory Report",
-    age: 6,
-    sex: "Male",
-    occupation: "Student",
-    symptoms: "Rash, Fever, Cough",
-    riskFactors: "Unvaccinated",
-    category: "High Risk",
-    dateReported: "2025-01-11",
-    contactNumber: "+234-803-456-7890",
-  },
-  {
-    caseId: "QFC5QI",
-    epidNumber: "LOS---25-079",
-    internalToken: "INT-004",
-    disease: "Lassa Fever",
-    diseaseVariant: "-",
-    caseClassification: "Probable case",
-    outcome: "Under Treatment",
-    investigationStatus: "Investigation pending",
-    personId: "XNQZBJ",
-    firstName: "Marijn",
-    lastName: "Peters",
-    state: "Edo",
-    lga: "Egor",
-    healthFacility: "University of Benin Teaching Hospital",
-    region: "South South",
-    dateOfOnset: "2025-01-22",
-    dateOfConfirmation: null,
-    reportingSource: "Clinical Diagnosis",
-    age: 42,
-    sex: "Male",
-    occupation: "Farmer",
-    symptoms: "High fever, Bleeding, Weakness",
-    riskFactors: "Exposure to rodents",
-    category: "High Risk",
-    dateReported: "2025-01-23",
-    contactNumber: "+234-804-567-8901",
-  },
-  {
-    caseId: "RPMYZZ",
-    epidNumber: "NIE-KTS-BAT-25-005",
-    internalToken: "INT-005",
-    disease: "Cholera",
-    diseaseVariant: "-",
-    caseClassification: "Confirmed case",
-    outcome: "Deceased",
-    investigationStatus: "Investigation done",
-    personId: "QRDNJM",
-    firstName: "Amina",
-    lastName: "Bello",
-    state: "Kano",
-    lga: "Municipal",
-    healthFacility: "Aminu Kano Teaching Hospital",
-    region: "North West",
-    dateOfOnset: "2025-01-08",
-    dateOfConfirmation: "2025-01-09",
-    reportingSource: "Laboratory Report",
-    age: 67,
-    sex: "Female",
-    occupation: "Trader",
-    symptoms: "Severe diarrhea, Dehydration",
-    riskFactors: "Contaminated water source",
-    category: "High Risk",
-    dateReported: "2025-01-09",
-    contactNumber: "+234-805-678-9012",
-  },
-];
-
 const filterOptions = {
   caseOrigin: ["All", "Imported", "Local"],
   outcome: [
@@ -173,6 +30,7 @@ const filterOptions = {
   ],
   disease: [
     "All",
+    "Rabies",
     "Yellow Fever",
     "COVID-19",
     "Measles",
@@ -181,9 +39,9 @@ const filterOptions = {
   ],
   classification: [
     "All",
-    "Confirmed case",
-    "Probable case",
-    "Suspect case",
+    "Confirmed",
+    "Probable",
+    "Suspect",
     "Not yet classified",
   ],
   followUp: ["All", "Pending", "Done", "Discarded"],
@@ -226,6 +84,10 @@ function Cases() {
   const [showFilters, setShowFilters] = useState(true);
   const [showNewCaseModal, setShowNewCaseModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Case details modal state
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedCase, setSelectedCase] = useState(null);
 
   // New case form data
   const [formData, setFormData] = useState({
@@ -290,30 +152,23 @@ function Cases() {
           // Direct array response
           setCases(response.data);
           setTotalCases(response.data.length);
-        } else if (response.data.data && Array.isArray(response.data.data)) {
-          // Nested data with pagination info
-          setCases(response.data.data);
-          setTotalCases(response.data.total || response.data.data.length);
-        } else if (
-          response.data.results &&
-          Array.isArray(response.data.results)
-        ) {
-          // Alternative nested structure
-          setCases(response.data.results);
-          setTotalCases(
-            response.data.total ||
-              response.data.count ||
-              response.data.results.length
-          );
+          console.log("Fetched Cases (Direct Array):", response.data);
+        } else if (response.data.items && Array.isArray(response.data.items)) {
+          // API response with 'items' property
+          setCases(response.data.items);
+          setTotalCases(response.data.total || response.data.items.length);
+          console.log("Fetched Cases (Items):", response.data.items);
         } else {
           // Unknown structure, try to find the array
           console.warn("Unknown API response structure:", response.data);
           setCases([]);
           setTotalCases(0);
+          console.log("Fetched Cases (Unknown Structure):", []);
         }
       } else {
         setCases([]);
         setTotalCases(0);
+        console.log("Fetched Cases (No Data):", []);
       }
     } catch (error) {
       console.error("Error fetching cases:", error);
@@ -331,8 +186,7 @@ function Cases() {
 
   // Enhanced filtering logic
   const filteredCases = useMemo(() => {
-    const casesToFilter = cases.length > 0 ? cases : mockCases; // Use API data if available, fallback to mock
-    return casesToFilter.filter((caseItem) => {
+    return cases.filter((caseItem) => {
       // Text searches
       if (
         filters.search &&
@@ -344,7 +198,7 @@ function Cases() {
 
       if (
         filters.personSearch &&
-        !`${caseItem.firstName} ${caseItem.lastName} ${caseItem.personId} ${caseItem.contactNumber}`
+        !`${caseItem.personID} ${caseItem.reporting_source}`
           .toLowerCase()
           .includes(filters.personSearch.toLowerCase())
       )
@@ -355,15 +209,10 @@ function Cases() {
         return false;
       if (
         filters.classification !== "All" &&
-        caseItem.caseClassification !== filters.classification
+        caseItem.classification !== filters.classification
       )
         return false;
       if (filters.outcome !== "All" && caseItem.outcome !== filters.outcome)
-        return false;
-      if (
-        filters.status !== "All" &&
-        caseItem.investigationStatus !== filters.status
-      )
         return false;
       if (filters.region !== "All" && caseItem.region !== filters.region)
         return false;
@@ -458,6 +307,12 @@ function Cases() {
     setCurrentPage(1);
   };
 
+  // Handle viewing case details
+  const handleViewDetails = (caseItem) => {
+    setSelectedCase(caseItem);
+    setShowDetailsModal(true);
+  };
+
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
@@ -540,7 +395,7 @@ function Cases() {
               Human Cases Directory
             </h2>
             <p className="text-sm text-gray-600">
-              Showing {filteredCases.length} of {mockCases.length} cases
+              Showing {filteredCases.length} of {totalCases} cases
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -804,12 +659,12 @@ function Cases() {
             {[
               {
                 label: "Total Cases",
-                count: (cases.length > 0 ? cases : mockCases).length,
+                count: totalCases,
                 color: "blue",
               },
               {
                 label: "Pending Investigation",
-                count: (cases.length > 0 ? cases : mockCases).filter(
+                count: cases.filter(
                   (c) =>
                     c.investigationStatus === "Investigation pending" ||
                     c.investigation_status === "Investigation pending"
@@ -818,7 +673,7 @@ function Cases() {
               },
               {
                 label: "Investigation Done",
-                count: (cases.length > 0 ? cases : mockCases).filter(
+                count: cases.filter(
                   (c) =>
                     c.investigationStatus === "Investigation done" ||
                     c.investigation_status === "Investigation done"
@@ -827,7 +682,7 @@ function Cases() {
               },
               {
                 label: "Confirmed Cases",
-                count: (cases.length > 0 ? cases : mockCases).filter(
+                count: cases.filter(
                   (c) =>
                     c.caseClassification === "Confirmed case" ||
                     c.case_classification === "Confirmed case"
@@ -967,7 +822,7 @@ function Cases() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {paginatedCases.map((caseItem, idx) => (
                     <tr
-                      key={caseItem.caseId}
+                      key={caseItem.case_id || caseItem.id}
                       className="hover:bg-gray-50 transition-colors"
                     >
                       {viewMode === "default" ? (
@@ -976,7 +831,7 @@ function Cases() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <span className="text-sm font-medium text-blue-600 hover:text-blue-800 cursor-pointer">
-                                {caseItem.caseId}
+                                {caseItem.case_id}
                               </span>
                             </div>
                           </td>
@@ -985,10 +840,10 @@ function Cases() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div>
                               <div className="text-sm font-medium text-gray-900">
-                                {caseItem.firstName} {caseItem.lastName}
+                                {caseItem.personID}
                               </div>
                               <div className="text-sm text-gray-500">
-                                {caseItem.personId}
+                                {caseItem.age}y, {caseItem.sex}
                               </div>
                             </div>
                           </td>
@@ -998,41 +853,47 @@ function Cases() {
                             <div className="text-sm text-gray-900">
                               {caseItem.disease}
                             </div>
-                            {caseItem.diseaseVariant &&
-                              caseItem.diseaseVariant !== "-" && (
-                                <div className="text-sm text-gray-500">
-                                  {caseItem.diseaseVariant}
-                                </div>
-                              )}
                           </td>
 
                           {/* Classification */}
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span
                               className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                caseItem.caseClassification === "Confirmed case"
+                                caseItem.classification === "Confirmed"
                                   ? "bg-red-100 text-red-800"
-                                  : caseItem.caseClassification ===
-                                    "Probable case"
+                                  : caseItem.classification === "Probable"
                                   ? "bg-orange-100 text-orange-800"
-                                  : caseItem.caseClassification ===
-                                    "Suspect case"
+                                  : caseItem.classification === "Suspect"
                                   ? "bg-yellow-100 text-yellow-800"
                                   : "bg-gray-100 text-gray-800"
                               }`}
                             >
-                              {caseItem.caseClassification}
+                              {caseItem.classification}
                             </span>
                           </td>
 
                           {/* Status */}
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {getStatusBadge(caseItem.investigationStatus)}
+                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                              Active
+                            </span>
                           </td>
 
                           {/* Outcome */}
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {getOutcomeBadge(caseItem.outcome)}
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                caseItem.outcome === "Deceased"
+                                  ? "bg-red-100 text-red-800"
+                                  : caseItem.outcome === "Recovered"
+                                  ? "bg-green-100 text-green-800"
+                                  : caseItem.outcome === "Under Treatment"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-gray-100 text-gray-800"
+                              }`}
+                            >
+                              {caseItem.outcome || "No Outcome Yet"}
+                            </span>
                           </td>
 
                           {/* Location */}
@@ -1048,7 +909,7 @@ function Cases() {
                           {/* Date Reported */}
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {new Date(
-                              caseItem.dateReported
+                              caseItem.reported_at
                             ).toLocaleDateString()}
                           </td>
 
@@ -1058,6 +919,7 @@ function Cases() {
                               <button
                                 className="text-blue-600 hover:text-blue-900 p-1 rounded"
                                 title="View Details"
+                                onClick={() => handleViewDetails(caseItem)}
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
@@ -1080,18 +942,18 @@ function Cases() {
                         <>
                           {/* Detailed view columns */}
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
-                            {caseItem.caseId}
+                            {caseItem.case_id}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {caseItem.epidNumber}
+                            {caseItem.case_id}
                           </td>
                           <td className="px-6 py-4">
                             <div className="text-sm">
                               <div className="font-medium text-gray-900">
-                                {caseItem.firstName} {caseItem.lastName}
+                                {caseItem.personID}
                               </div>
                               <div className="text-gray-500">
-                                ID: {caseItem.personId}
+                                ID: {caseItem.personID}
                               </div>
                               <div className="text-gray-500">
                                 {caseItem.age}y, {caseItem.sex}
@@ -1106,12 +968,6 @@ function Cases() {
                               <div className="font-medium text-gray-900">
                                 {caseItem.disease}
                               </div>
-                              {caseItem.diseaseVariant &&
-                                caseItem.diseaseVariant !== "-" && (
-                                  <div className="text-gray-500">
-                                    {caseItem.diseaseVariant}
-                                  </div>
-                                )}
                               <div className="text-gray-500 mt-1">
                                 {caseItem.symptoms}
                               </div>
@@ -1120,25 +976,37 @@ function Cases() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span
                               className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                caseItem.caseClassification === "Confirmed case"
+                                caseItem.classification === "Confirmed"
                                   ? "bg-red-100 text-red-800"
-                                  : caseItem.caseClassification ===
-                                    "Probable case"
+                                  : caseItem.classification === "Probable"
                                   ? "bg-orange-100 text-orange-800"
-                                  : caseItem.caseClassification ===
-                                    "Suspect case"
+                                  : caseItem.classification === "Suspect"
                                   ? "bg-yellow-100 text-yellow-800"
                                   : "bg-gray-100 text-gray-800"
                               }`}
                             >
-                              {caseItem.caseClassification}
+                              {caseItem.classification}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {getStatusBadge(caseItem.investigationStatus)}
+                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                              Active
+                            </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {getOutcomeBadge(caseItem.outcome)}
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                caseItem.outcome === "Deceased"
+                                  ? "bg-red-100 text-red-800"
+                                  : caseItem.outcome === "Recovered"
+                                  ? "bg-green-100 text-green-800"
+                                  : caseItem.outcome === "Under Treatment"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-gray-100 text-gray-800"
+                              }`}
+                            >
+                              {caseItem.outcome || "No Outcome Yet"}
+                            </span>
                           </td>
                           <td className="px-6 py-4">
                             <div className="text-sm">
@@ -1152,7 +1020,7 @@ function Cases() {
                                 {caseItem.region}
                               </div>
                               <div className="text-gray-500 mt-1">
-                                {caseItem.healthFacility}
+                                {caseItem.health_facility}
                               </div>
                             </div>
                           </td>
@@ -1161,35 +1029,36 @@ function Cases() {
                               <div>
                                 <span className="font-medium">Onset:</span>{" "}
                                 {new Date(
-                                  caseItem.dateOfOnset
+                                  caseItem.date_of_onset
                                 ).toLocaleDateString()}
                               </div>
                               <div>
                                 <span className="font-medium">Reported:</span>{" "}
                                 {new Date(
-                                  caseItem.dateReported
+                                  caseItem.reported_at
                                 ).toLocaleDateString()}
                               </div>
-                              {caseItem.dateOfConfirmation && (
+                              {caseItem.date_of_confirmation && (
                                 <div>
                                   <span className="font-medium">
                                     Confirmed:
                                   </span>{" "}
                                   {new Date(
-                                    caseItem.dateOfConfirmation
+                                    caseItem.date_of_confirmation
                                   ).toLocaleDateString()}
                                 </div>
                               )}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {caseItem.contactNumber}
+                            {caseItem.reporting_source}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div className="flex items-center gap-2">
                               <button
                                 className="text-blue-600 hover:text-blue-900 p-1 rounded"
                                 title="View Details"
+                                onClick={() => handleViewDetails(caseItem)}
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
@@ -1681,6 +1550,313 @@ function Cases() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Case Details Modal */}
+      {showDetailsModal && selectedCase && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Case Details
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  {selectedCase.case_id} - {selectedCase.disease}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Basic Information */}
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4 border-b border-gray-200 pb-2">
+                      Basic Information
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Case ID:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.case_id}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Person ID:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.personID}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Category:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.category}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Disease:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.disease}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Classification:
+                        </span>
+                        <span
+                          className={`text-sm font-medium px-2 py-1 rounded-full ${
+                            selectedCase.classification === "Confirmed"
+                              ? "bg-red-100 text-red-800"
+                              : selectedCase.classification === "Probable"
+                              ? "bg-orange-100 text-orange-800"
+                              : selectedCase.classification === "Suspect"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {selectedCase.classification}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Outcome:
+                        </span>
+                        <span
+                          className={`text-sm font-medium px-2 py-1 rounded-full ${
+                            selectedCase.outcome === "Deceased"
+                              ? "bg-red-100 text-red-800"
+                              : selectedCase.outcome === "Recovered"
+                              ? "bg-green-100 text-green-800"
+                              : selectedCase.outcome === "Under Treatment"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {selectedCase.outcome || "No Outcome Yet"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Personal Details */}
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4 border-b border-gray-200 pb-2">
+                      Personal Details
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Age:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.age} years
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Sex:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.sex}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Occupation:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.occupation}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Location Details */}
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4 border-b border-gray-200 pb-2">
+                      Location Details
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          State:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.state}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          LGA:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.lga}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Region:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.region}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Health Facility:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.health_facility}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Coordinates:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.latitude}, {selectedCase.longitude}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Clinical Information */}
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4 border-b border-gray-200 pb-2">
+                      Important Dates
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Date of Onset:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {new Date(
+                            selectedCase.date_of_onset
+                          ).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Date of Confirmation:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {new Date(
+                            selectedCase.date_of_confirmation
+                          ).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Reported At:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {new Date(selectedCase.reported_at).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4 border-b border-gray-200 pb-2">
+                      Reporting Details
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Reporting Source:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.reporting_source}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Reporter ID:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.reporter_id || "N/A"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm font-medium text-gray-500">
+                          Record ID:
+                        </span>
+                        <span className="text-sm text-gray-900">
+                          {selectedCase.id}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-4 border-b border-gray-200 pb-2">
+                      Clinical Information
+                    </h3>
+                    <div className="space-y-4">
+                      <div>
+                        <span className="text-sm font-medium text-gray-500 block mb-2">
+                          Symptoms:
+                        </span>
+                        <div className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">
+                          {selectedCase.symptoms || "No symptoms recorded"}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-sm font-medium text-gray-500 block mb-2">
+                          Risk Factors:
+                        </span>
+                        <div className="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">
+                          {selectedCase.risk_factors ||
+                            "No risk factors recorded"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
+                <button
+                  onClick={() => setShowDetailsModal(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    // Handle edit action
+                    setShowDetailsModal(false);
+                    console.log("Edit case:", selectedCase.case_id);
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors"
+                >
+                  Edit Case
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
