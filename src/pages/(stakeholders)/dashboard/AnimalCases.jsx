@@ -268,18 +268,6 @@ const AnimalCases = () => {
                   <Filter className="w-4 h-4" />
                   {showFilters ? "Hide Filters" : "Show Filters"}
                 </button>
-                <button
-                  onClick={() =>
-                    setViewMode(viewMode === "default" ? "detailed" : "default")
-                  }
-                  className={`px-4 py-2 rounded-lg font-medium transition ${
-                    viewMode === "default"
-                      ? "bg-blue-600 text-white hover:bg-blue-700"
-                      : "border border-blue-600 text-blue-600 hover:bg-blue-50"
-                  }`}
-                >
-                  {viewMode === "default" ? "DETAILED VIEW" : "DEFAULT VIEW"}
-                </button>
                 <button className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-gray-700 transition">
                   <Download className="w-4 h-4" />
                   Export
