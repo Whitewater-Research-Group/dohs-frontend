@@ -10,3 +10,4 @@ export { default as NewCaseModal } from "./NewCaseModal";
 export { default as AnimalCaseStatsCards } from "./AnimalCaseStatsCards";
 export { default as AnimalCaseFiltersPanel } from "./AnimalCaseFiltersPanel";
 export { default as AnimalCaseTableRow } from "./AnimalCaseTableRow";
+export { default as AnimalCaseDetailsModal } from "./AnimalCaseDetailsModal";

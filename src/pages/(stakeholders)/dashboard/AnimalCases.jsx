@@ -6,6 +6,7 @@ import {
   AnimalCaseStatsCards,
   AnimalCaseFiltersPanel,
   AnimalCaseTableRow,
+  AnimalCaseDetailsModal,
 } from "../../../components/cases";
 
 const AnimalCases = () => {
@@ -21,6 +22,10 @@ const AnimalCases = () => {
   const [pageSize, setPageSize] = useState(10);
   const [showNewCaseModal, setShowNewCaseModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Case details modal state
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedCase, setSelectedCase] = useState(null);
 
   const [filters, setFilters] = useState({
     search: "",
@@ -192,6 +197,12 @@ const AnimalCases = () => {
     setCurrentPage(1);
   };
 
+  // Handle view case details
+  const handleViewDetails = (caseItem) => {
+    setSelectedCase(caseItem);
+    setShowDetailsModal(true);
+  };
+
   // Handle opening new case modal
   const handleNewCaseClick = () => {
     setShowNewCaseModal(true);
@@ -343,6 +354,7 @@ const AnimalCases = () => {
                       <AnimalCaseTableRow
                         key={caseItem.case_id || caseItem.id}
                         caseItem={caseItem}
+                        onViewDetails={handleViewDetails}
                       />
                     ))}
                   </tbody>
@@ -384,6 +396,13 @@ const AnimalCases = () => {
             </div>
           </>
         )}
+
+        {/* Animal Case Details Modal */}
+        <AnimalCaseDetailsModal
+          isOpen={showDetailsModal}
+          onClose={() => setShowDetailsModal(false)}
+          caseData={selectedCase}
+        />
       </div>
     </DashboardLayout>
   );

@@ -1,7 +1,7 @@
 import React from "react";
 import { Eye, Edit, Trash2 } from "lucide-react";
 
-const AnimalCaseTableRow = ({ caseItem }) => {
+const AnimalCaseTableRow = ({ caseItem, onViewDetails }) => {
   return (
     <tr className="hover:bg-gray-50 transition-colors">
       {/* Case ID */}
@@ -98,6 +98,7 @@ const AnimalCaseTableRow = ({ caseItem }) => {
           <button
             className="text-blue-600 hover:text-blue-800"
             title="View Details"
+            onClick={() => onViewDetails(caseItem)}
           >
             <Eye className="w-4 h-4" />
           </button>
