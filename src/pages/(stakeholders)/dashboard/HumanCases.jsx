@@ -72,7 +72,7 @@ function Cases() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [viewMode, setViewMode] = useState("default"); // default, detailed
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const [showNewCaseModal, setShowNewCaseModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
