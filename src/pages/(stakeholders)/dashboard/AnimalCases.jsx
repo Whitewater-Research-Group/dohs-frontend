@@ -211,17 +211,33 @@ const AnimalCases = () => {
   return (
     <DashboardLayout>
       <div className="flex flex-col gap-6 font-primary">
-        {/* Loading and Error States */}
+        {/* Loading State */}
         {isLoading && (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
+            <div className="flex flex-col items-center justify-center">
+              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+              <p className="text-gray-600">Loading cases...</p>
+            </div>
           </div>
         )}
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            <p className="font-medium">Error loading cases</p>
-            <p className="text-sm">{error}</p>
+        {/* Error State */}
+        {error && !isLoading && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-6">
+            <div className="flex items-center gap-3">
+              <div>
+                <h3 className="text-red-800 font-medium">
+                  Error Loading Cases
+                </h3>
+                <p className="text-red-700 text-sm mt-1">{error}</p>
+                <button
+                  onClick={() => fetchCases(1, apiPageSize)}
+                  className="mt-2 text-sm bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
