@@ -125,6 +125,8 @@ function InteractiveMap() {
       console.error("Error fetching human cases:", error);
       setError(error.response?.data?.message || "Failed to fetch human cases");
       setHumanCasesData([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -303,6 +305,24 @@ function InteractiveMap() {
 
     fetchAllCases();
   }, []);
+
+  // Function to refresh all data manually
+  const refreshAllData = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await Promise.all([
+        fetchHumanCases(),
+        fetchAnimalCases(),
+        fetchEnvironmentalCases(),
+      ]);
+    } catch (error) {
+      console.error("Error refreshing cases:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Combine all case data when any cases are loaded
   useEffect(() => {
@@ -556,9 +576,9 @@ function InteractiveMap() {
 
               <div className="flex gap-2">
                 <button
-                  onClick={fetchHumanCases}
+                  onClick={refreshAllData}
                   className="flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
-                  title="Refresh Human Cases Data"
+                  title="Refresh All Cases Data"
                   disabled={isLoading}
                 >
                   <RefreshCw
