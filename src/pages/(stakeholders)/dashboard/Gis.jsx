@@ -30,130 +30,13 @@ import {
   EyeOff,
 } from "lucide-react";
 
-// Multi-layer case data for One Health surveillance
-// Human cases will be fetched from API
-
-const animalCasesData = [
-  {
-    id: 5,
-    name: "Green Valley Farm - FMD",
-    lat: 6.6018,
-    lon: 3.3515,
-    cases: 45,
-    disease: "Foot and Mouth Disease",
-    species: "Cattle",
-    severity: "high",
-    type: "animal",
-    farmOwner: "Ahmed Hassan",
-    reportedDate: "2024-08-18",
-    status: "quarantined",
-  },
-  {
-    id: 6,
-    name: "Sunrise Poultry - Avian Flu",
-    lat: 7.1475,
-    lon: 3.3619,
-    cases: 2000,
-    disease: "Avian Influenza H5N1",
-    species: "Poultry",
-    severity: "critical",
-    type: "animal",
-    farmOwner: "Grace Adebayo",
-    reportedDate: "2024-08-19",
-    status: "culling",
-  },
-  {
-    id: 7,
-    name: "Northern Livestock - PPR",
-    lat: 11.5804,
-    lon: 8.9971,
-    cases: 120,
-    disease: "Peste des Petits Ruminants",
-    species: "Goats",
-    severity: "medium",
-    type: "animal",
-    farmOwner: "Musa Ibrahim",
-    reportedDate: "2024-08-16",
-    status: "treatment",
-  },
-  {
-    id: 8,
-    name: "Coastal Fish Farm - VHS",
-    lat: 5.2058,
-    lon: 6.7013,
-    cases: 500,
-    disease: "Viral Hemorrhagic Septicemia",
-    species: "Fish",
-    severity: "high",
-    type: "animal",
-    farmOwner: "Johnson Okoro",
-    reportedDate: "2024-08-17",
-    status: "isolation",
-  },
-];
-
-const environmentalCasesData = [
-  {
-    id: 9,
-    name: "Victoria Island Water Contamination",
-    lat: 6.4281,
-    lon: 3.4219,
-    cases: 5000,
-    contaminant: "Lead",
-    incidentType: "Water Contamination",
-    severity: "critical",
-    type: "environmental",
-    affectedRadius: 2000, // meters
-    reportedDate: "2024-08-14",
-    status: "remediation",
-  },
-  {
-    id: 10,
-    name: "Ikeja Industrial Air Pollution",
-    lat: 6.5924,
-    lon: 3.3374,
-    cases: 3200,
-    contaminant: "PM2.5",
-    incidentType: "Air Pollution",
-    severity: "high",
-    type: "environmental",
-    affectedRadius: 1500,
-    reportedDate: "2024-08-13",
-    status: "monitoring",
-  },
-  {
-    id: 11,
-    name: "Niger River Oil Spill",
-    lat: 4.9247,
-    lon: 6.2712,
-    cases: 8000,
-    contaminant: "Crude Oil",
-    incidentType: "Water Body Contamination",
-    severity: "critical",
-    type: "environmental",
-    affectedRadius: 5000,
-    reportedDate: "2024-08-11",
-    status: "cleanup",
-  },
-  {
-    id: 12,
-    name: "Kaduna Soil Contamination",
-    lat: 10.5105,
-    lon: 7.4165,
-    cases: 1200,
-    contaminant: "Heavy Metals",
-    incidentType: "Soil Contamination",
-    severity: "medium",
-    type: "environmental",
-    affectedRadius: 800,
-    reportedDate: "2024-08-09",
-    status: "assessment",
-  },
-];
+// All case data (human, animal, environmental) will be fetched from API
 
 function InteractiveMap() {
   const [healthData, setHealthData] = useState([]);
   const [humanCasesData, setHumanCasesData] = useState([]);
+  const [animalCasesData, setAnimalCasesData] = useState([]);
+  const [environmentalCasesData, setEnvironmentalCasesData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stateColor, setStateColor] = useState("#90ee90");
@@ -242,8 +125,6 @@ function InteractiveMap() {
       console.error("Error fetching human cases:", error);
       setError(error.response?.data?.message || "Failed to fetch human cases");
       setHumanCasesData([]);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -275,11 +156,155 @@ function InteractiveMap() {
     }
   };
 
+  // Fetch animal cases from API
+  const fetchAnimalCases = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+
+      const response = await axios.get(
+        "https://backend.onehealth-wwrg.com/api/v1/reports/animal",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          params: {
+            page: 1,
+            page_size: 100,
+            sort_by: "created_at",
+            sort_order: "desc",
+          },
+        }
+      );
+
+      console.log("Animal cases API response:", response.data);
+
+      if (response.data) {
+        const items = Array.isArray(response.data)
+          ? response.data
+          : response.data.items || [];
+
+        const transformedAnimalCases = items.map((item, index) => ({
+          id: item.id || index + 1,
+          name: `${item.case_id} - ${item.disease}`,
+          lat: item.latitude,
+          lon: item.longitude,
+          cases: 1,
+          disease: item.disease,
+          species: item.animal_type,
+          severity: getSeverityFromClassification(item.classification),
+          type: "animal",
+          reportedDate: item.reported_at
+            ? new Date(item.reported_at).toISOString().split("T")[0]
+            : null,
+          status: getStatusFromOutcome(item.outcome),
+          caseId: item.case_id,
+          animalType: item.animal_type,
+          farmOwner: item.farm_owner,
+          state: item.state,
+          lga: item.lga,
+          region: item.region,
+          classification: item.classification,
+          outcome: item.outcome,
+        }));
+
+        setAnimalCasesData(transformedAnimalCases);
+        console.log("Transformed animal cases:", transformedAnimalCases);
+      } else {
+        setAnimalCasesData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching animal cases:", error);
+      setAnimalCasesData([]);
+    }
+  };
+
+  // Fetch environmental cases from API
+  const fetchEnvironmentalCases = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+
+      const response = await axios.get(
+        "https://backend.onehealth-wwrg.com/api/v1/reports/env",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          params: {
+            page: 1,
+            page_size: 100,
+            sort_by: "created_at",
+            sort_order: "desc",
+          },
+        }
+      );
+
+      console.log("Environmental cases API response:", response.data);
+
+      if (response.data) {
+        const items = Array.isArray(response.data)
+          ? response.data
+          : response.data.items || [];
+
+        const transformedEnvCases = items.map((item, index) => ({
+          id: item.id || index + 1,
+          name: `${item.case_id} - ${item.environmental_factors}`,
+          lat: item.latitude,
+          lon: item.longitude,
+          cases: 1,
+          disease: item.disease,
+          contaminant: item.environmental_factors,
+          severity: getSeverityFromClassification(item.classification),
+          type: "environmental",
+          reportedDate: item.reported_at
+            ? new Date(item.reported_at).toISOString().split("T")[0]
+            : null,
+          status: item.sample_collected ? "assessment" : "pending",
+          caseId: item.case_id,
+          environmentalFactors: item.environmental_factors,
+          sampleCollected: item.sample_collected,
+          labResults: item.lab_results,
+          state: item.state,
+          lga: item.lga,
+          region: item.region,
+          classification: item.classification,
+          outcome: item.outcome,
+        }));
+
+        setEnvironmentalCasesData(transformedEnvCases);
+        console.log("Transformed environmental cases:", transformedEnvCases);
+      } else {
+        setEnvironmentalCasesData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching environmental cases:", error);
+      setEnvironmentalCasesData([]);
+    }
+  };
+
   useEffect(() => {
-    fetchHumanCases();
+    const fetchAllCases = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        await Promise.all([
+          fetchHumanCases(),
+          fetchAnimalCases(),
+          fetchEnvironmentalCases(),
+        ]);
+      } catch (error) {
+        console.error("Error fetching cases:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAllCases();
   }, []);
 
-  // Combine all case data when human cases are loaded
+  // Combine all case data when any cases are loaded
   useEffect(() => {
     const allCasesData = [
       ...humanCasesData,
@@ -287,7 +312,8 @@ function InteractiveMap() {
       ...environmentalCasesData,
     ];
     setHealthData(allCasesData);
-  }, [humanCasesData]);
+    console.log("Combined all cases:", allCasesData);
+  }, [humanCasesData, animalCasesData, environmentalCasesData]);
 
   // Filter data based on active filters and search
   const filteredData = healthData.filter((item) => {
