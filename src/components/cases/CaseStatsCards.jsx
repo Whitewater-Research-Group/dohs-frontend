@@ -1,5 +1,5 @@
 import React from "react";
-import { Activity, Users, TrendingUp, AlertTriangle } from "lucide-react";
+import { Activity, Users, Skull, AlertTriangle } from "lucide-react";
 
 const CaseStatsCards = ({ cases }) => {
   const stats = [
@@ -10,12 +10,10 @@ const CaseStatsCards = ({ cases }) => {
       color: "blue",
     },
     {
-      label: "Active Cases",
-      value: cases.filter(
-        (c) => c.outcome === "Under Treatment" || c.outcome === "No Outcome Yet"
-      ).length,
-      icon: TrendingUp,
-      color: "yellow",
+      label: "Deceased",
+      value: cases.filter((c) => c.outcome === "Deceased").length,
+      icon: Skull,
+      color: "red",
     },
     {
       label: "Recovered",
@@ -27,7 +25,7 @@ const CaseStatsCards = ({ cases }) => {
       label: "Confirmed",
       value: cases.filter((c) => c.classification === "Confirmed").length,
       icon: AlertTriangle,
-      color: "red",
+      color: "orange",
     },
   ];
 
