@@ -101,6 +101,7 @@ const AnimalCases = () => {
   };
 
   useEffect(() => {
+    console.log("AnimalCases: Component mounted, fetching cases...");
     fetchCases(apiCurrentPage, apiPageSize);
   }, []);
 
@@ -211,6 +212,12 @@ const AnimalCases = () => {
   return (
     <DashboardLayout>
       <div className="flex flex-col gap-6 font-primary">
+        {console.log("AnimalCases Render:", {
+          isLoading,
+          error,
+          casesCount: cases.length,
+          filteredCount: filteredCases.length,
+        })}
         {/* Loading State */}
         {isLoading && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">

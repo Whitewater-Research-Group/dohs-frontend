@@ -11,3 +11,9 @@ export { default as AnimalCaseStatsCards } from "./AnimalCaseStatsCards";
 export { default as AnimalCaseFiltersPanel } from "./AnimalCaseFiltersPanel";
 export { default as AnimalCaseTableRow } from "./AnimalCaseTableRow";
 export { default as AnimalCaseDetailsModal } from "./AnimalCaseDetailsModal";
+
+// Environmental-specific components
+export { default as EnvironmentalCaseStatsCards } from "./EnvironmentalCaseStatsCards";
+export { default as EnvironmentalCaseFiltersPanel } from "./EnvironmentalCaseFiltersPanel";
+export { default as EnvironmentalCaseTableRow } from "./EnvironmentalCaseTableRow";
+export { default as EnvironmentalCaseDetailsModal } from "./EnvironmentalCaseDetailsModal";
