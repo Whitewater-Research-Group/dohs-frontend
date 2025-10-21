@@ -52,13 +52,25 @@ function InteractiveMap() {
     animal: true,
     environmental: true,
   });
+  const [newCaseAlert, setNewCaseAlert] = useState(null);
+  const [previousCaseCount, setPreviousCaseCount] = useState({
+    human: 0,
+    animal: 0,
+    environmental: 0,
+  });
 
   const mapRef = useRef(null);
+  const audioRef = useRef(null);
+  const pollingIntervalRef = useRef(null);
+  const soundIntervalRef = useRef(null);
+  const soundTimeoutRef = useRef(null);
 
   // Fetch human cases from API
-  const fetchHumanCases = async () => {
+  const fetchHumanCases = async (silent = false) => {
     try {
-      setIsLoading(true);
+      if (!silent) {
+        setIsLoading(true);
+      }
       setError(null);
       const token = localStorage.getItem("authToken");
 
@@ -118,15 +130,20 @@ function InteractiveMap() {
 
         setHumanCasesData(transformedHumanCases);
         console.log("Transformed human cases:", transformedHumanCases);
+        return transformedHumanCases;
       } else {
         setHumanCasesData([]);
+        return [];
       }
     } catch (error) {
       console.error("Error fetching human cases:", error);
       setError(error.response?.data?.message || "Failed to fetch human cases");
       setHumanCasesData([]);
+      return [];
     } finally {
-      setIsLoading(false);
+      if (!silent) {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -158,8 +175,154 @@ function InteractiveMap() {
     }
   };
 
+  // Function to play alert sound repeatedly
+  const playAlertSound = () => {
+    // Clear any existing sound intervals/timeouts first
+    stopAlertSound();
+
+    // Create a simple beep sound using Web Audio API
+    const playBeep = () => {
+      try {
+        const audioContext = new (window.AudioContext ||
+          window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        // Set frequency for alert sound (higher pitch)
+        oscillator.frequency.value = 800;
+        oscillator.type = "sine";
+
+        // Set volume
+        gainNode.gain.value = 0.3;
+
+        // Play sound
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.3);
+
+        // Second beep
+        const oscillator2 = audioContext.createOscillator();
+        const gainNode2 = audioContext.createGain();
+        oscillator2.connect(gainNode2);
+        gainNode2.connect(audioContext.destination);
+        oscillator2.frequency.value = 1000;
+        oscillator2.type = "sine";
+        gainNode2.gain.value = 0.3;
+        oscillator2.start(audioContext.currentTime + 0.4);
+        oscillator2.stop(audioContext.currentTime + 0.7);
+
+        console.log("Alert sound played");
+      } catch (error) {
+        console.log("Audio play failed:", error);
+      }
+    };
+
+    // Play immediately
+    playBeep();
+
+    // Repeat every 3 seconds for 1 minute
+    soundIntervalRef.current = setInterval(playBeep, 3000);
+
+    // Stop after 1 minute
+    soundTimeoutRef.current = setTimeout(() => {
+      stopAlertSound();
+      console.log("Alert sound stopped after 1 minute");
+    }, 60000);
+  };
+
+  // Function to stop alert sound
+  const stopAlertSound = () => {
+    if (soundIntervalRef.current) {
+      clearInterval(soundIntervalRef.current);
+      soundIntervalRef.current = null;
+    }
+    if (soundTimeoutRef.current) {
+      clearTimeout(soundTimeoutRef.current);
+      soundTimeoutRef.current = null;
+    }
+    console.log("Alert sound stopped");
+  };
+
+  // Function to show new case notification
+  const showNewCaseNotification = (caseData) => {
+    setNewCaseAlert(caseData);
+    playAlertSound();
+
+    // Auto-hide notification after 1 minute (60 seconds)
+    setTimeout(() => {
+      setNewCaseAlert(null);
+      stopAlertSound();
+    }, 60000);
+  };
+
+  // Check for new cases and trigger alerts
+  const checkForNewCases = (newHumanCases, newAnimalCases, newEnvCases) => {
+    const currentCounts = {
+      human: newHumanCases.length,
+      animal: newAnimalCases.length,
+      environmental: newEnvCases.length,
+    };
+
+    // Check if this is the initial load
+    const isInitialLoad =
+      previousCaseCount.human === 0 &&
+      previousCaseCount.animal === 0 &&
+      previousCaseCount.environmental === 0;
+
+    if (!isInitialLoad) {
+      // Check for new human cases
+      if (currentCounts.human > previousCaseCount.human) {
+        const newCases = newHumanCases.slice(
+          0,
+          currentCounts.human - previousCaseCount.human
+        );
+        newCases.forEach((caseData) => {
+          showNewCaseNotification({
+            ...caseData,
+            message: `New Human Case Alert: ${caseData.disease}`,
+          });
+        });
+      }
+
+      // Check for new animal cases
+      if (currentCounts.animal > previousCaseCount.animal) {
+        const newCases = newAnimalCases.slice(
+          0,
+          currentCounts.animal - previousCaseCount.animal
+        );
+        newCases.forEach((caseData) => {
+          showNewCaseNotification({
+            ...caseData,
+            message: `New Animal Case Alert: ${caseData.disease}`,
+          });
+        });
+      }
+
+      // Check for new environmental cases
+      if (currentCounts.environmental > previousCaseCount.environmental) {
+        const newCases = newEnvCases.slice(
+          0,
+          currentCounts.environmental - previousCaseCount.environmental
+        );
+        newCases.forEach((caseData) => {
+          showNewCaseNotification({
+            ...caseData,
+            message: `New Environmental Case Alert: ${
+              caseData.contaminant || caseData.disease
+            }`,
+          });
+        });
+      }
+    }
+
+    // Update previous counts
+    setPreviousCaseCount(currentCounts);
+  };
+
   // Fetch animal cases from API
-  const fetchAnimalCases = async () => {
+  const fetchAnimalCases = async (silent = false) => {
     try {
       const token = localStorage.getItem("authToken");
 
@@ -212,17 +375,20 @@ function InteractiveMap() {
 
         setAnimalCasesData(transformedAnimalCases);
         console.log("Transformed animal cases:", transformedAnimalCases);
+        return transformedAnimalCases;
       } else {
         setAnimalCasesData([]);
+        return [];
       }
     } catch (error) {
       console.error("Error fetching animal cases:", error);
       setAnimalCasesData([]);
+      return [];
     }
   };
 
   // Fetch environmental cases from API
-  const fetchEnvironmentalCases = async () => {
+  const fetchEnvironmentalCases = async (silent = false) => {
     try {
       const token = localStorage.getItem("authToken");
 
@@ -276,12 +442,15 @@ function InteractiveMap() {
 
         setEnvironmentalCasesData(transformedEnvCases);
         console.log("Transformed environmental cases:", transformedEnvCases);
+        return transformedEnvCases;
       } else {
         setEnvironmentalCasesData([]);
+        return [];
       }
     } catch (error) {
       console.error("Error fetching environmental cases:", error);
       setEnvironmentalCasesData([]);
+      return [];
     }
   };
 
@@ -291,11 +460,14 @@ function InteractiveMap() {
       setError(null);
 
       try {
-        await Promise.all([
+        const [humanCases, animalCases, envCases] = await Promise.all([
           fetchHumanCases(),
           fetchAnimalCases(),
           fetchEnvironmentalCases(),
         ]);
+
+        // Initialize case counts on first load
+        checkForNewCases(humanCases, animalCases, envCases);
       } catch (error) {
         console.error("Error fetching cases:", error);
       } finally {
@@ -306,17 +478,48 @@ function InteractiveMap() {
     fetchAllCases();
   }, []);
 
+  // Real-time polling effect - checks for new cases every 10 seconds
+  useEffect(() => {
+    const pollForNewCases = async () => {
+      try {
+        const [humanCases, animalCases, envCases] = await Promise.all([
+          fetchHumanCases(true), // silent mode - no loading spinner
+          fetchAnimalCases(true),
+          fetchEnvironmentalCases(true),
+        ]);
+
+        // Check for new cases and trigger alerts
+        checkForNewCases(humanCases, animalCases, envCases);
+      } catch (error) {
+        console.error("Error polling for new cases:", error);
+      }
+    };
+
+    // Set up polling interval (10 seconds)
+    pollingIntervalRef.current = setInterval(pollForNewCases, 10000);
+
+    // Cleanup on unmount
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
+  }, [humanCasesData, animalCasesData, environmentalCasesData]);
+
   // Function to refresh all data manually
   const refreshAllData = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      await Promise.all([
+      const [humanCases, animalCases, envCases] = await Promise.all([
         fetchHumanCases(),
         fetchAnimalCases(),
         fetchEnvironmentalCases(),
       ]);
+
+      // Check for new cases
+      checkForNewCases(humanCases, animalCases, envCases);
     } catch (error) {
       console.error("Error refreshing cases:", error);
     } finally {
@@ -1078,6 +1281,110 @@ function InteractiveMap() {
             </LayersControl>
           </MapContainer>
         </div>
+
+        {/* New Case Alert Notification */}
+        {newCaseAlert && (
+          <div
+            className="fixed top-20 right-4 z-[10000]"
+            style={{ animation: "bounce 1s infinite" }}
+          >
+            <div
+              className="bg-red-600 px-6 py-5 rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] max-w-md border-4 border-yellow-400"
+              style={{ backgroundColor: "#dc2626", opacity: 1 }}
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div
+                    className="w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center animate-pulse shadow-lg"
+                    style={{ backgroundColor: "#facc15" }}
+                  >
+                    {newCaseAlert.type === "human" && (
+                      <Users className="w-7 h-7 text-red-700" />
+                    )}
+                    {newCaseAlert.type === "animal" && (
+                      <PawPrint className="w-7 h-7 text-green-700" />
+                    )}
+                    {newCaseAlert.type === "environmental" && (
+                      <Leaf className="w-7 h-7 text-emerald-700" />
+                    )}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3
+                    className="font-black text-2xl mb-3 tracking-wide"
+                    style={{ color: "#fef08a" }}
+                  >
+                    🚨 NEW CASE ALERT!
+                  </h3>
+                  <p
+                    className="text-lg font-bold mb-4"
+                    style={{ color: "#ffffff" }}
+                  >
+                    {newCaseAlert.message}
+                  </p>
+                  <div
+                    className="text-base space-y-3 bg-red-800 p-4 rounded-lg border-2 border-red-900"
+                    style={{ backgroundColor: "#991b1b" }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold" style={{ color: "#fde047" }}>
+                        📍 Location:
+                      </span>{" "}
+                      <span
+                        className="font-semibold"
+                        style={{ color: "#f3f4f6" }}
+                      >
+                        {newCaseAlert.state}, {newCaseAlert.lga}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold" style={{ color: "#fde047" }}>
+                        ⚠️ Severity:
+                      </span>{" "}
+                      <span
+                        className="uppercase font-black px-3 py-1 rounded-md"
+                        style={{ color: "#ffffff", backgroundColor: "#ea580c" }}
+                      >
+                        {newCaseAlert.severity}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold" style={{ color: "#fde047" }}>
+                        🕐 Time:
+                      </span>{" "}
+                      <span
+                        className="font-semibold"
+                        style={{ color: "#f3f4f6" }}
+                      >
+                        {new Date().toLocaleTimeString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setNewCaseAlert(null);
+                    stopAlertSound();
+                  }}
+                  className="rounded-full w-10 h-10 flex items-center justify-center font-black text-4xl leading-none transition-all duration-200 hover:scale-110"
+                  style={{
+                    color: "#fef08a",
+                    backgroundColor: "rgba(153, 27, 27, 0.5)",
+                  }}
+                  title="Close alert"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Hidden Audio Element for Alert Sound */}
+        <audio
+          ref={audioRef}
+          src="data:audio/wav;base64,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"
+        />
       </div>
     </DashboardLayout>
   );
