@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import DashboardLayout from "../../../components/dashboardLayouts/Dashboard";
 import axios from "axios";
 import { Filter, Download, Plus } from "lucide-react";
+import * as XLSX from "xlsx";
 import {
   CaseStatsCards,
   CaseFiltersPanel,
@@ -316,6 +317,74 @@ function Cases() {
     setShowNewCaseModal(true);
   };
 
+  // Handle export to Excel
+  const handleExportToExcel = () => {
+    // Prepare data for export
+    const exportData = filteredCases.map((caseItem) => ({
+      "Case ID": caseItem.case_id,
+      "EPID Number": caseItem.personID,
+      Disease: caseItem.disease,
+      Classification: caseItem.classification,
+      Outcome: caseItem.outcome,
+      Age: caseItem.age,
+      Sex: caseItem.sex,
+      Occupation: caseItem.occupation,
+      State: caseItem.state,
+      LGA: caseItem.lga,
+      Region: caseItem.region,
+      "Health Facility": caseItem.health_facility,
+      "Reporting Source": caseItem.reporting_source,
+      "Date of Onset": caseItem.date_of_onset,
+      "Date of Confirmation": caseItem.date_of_confirmation,
+      Symptoms: caseItem.symptoms,
+      "Risk Factors": caseItem.risk_factors,
+      Latitude: caseItem.latitude,
+      Longitude: caseItem.longitude,
+      "Reported At": caseItem.reported_at
+        ? new Date(caseItem.reported_at).toLocaleString()
+        : "",
+    }));
+
+    // Create worksheet
+    const ws = XLSX.utils.json_to_sheet(exportData);
+
+    // Set column widths
+    const colWidths = [
+      { wch: 12 }, // Case ID
+      { wch: 15 }, // EPID Number
+      { wch: 20 }, // Disease
+      { wch: 15 }, // Classification
+      { wch: 15 }, // Outcome
+      { wch: 8 }, // Age
+      { wch: 10 }, // Sex
+      { wch: 20 }, // Occupation
+      { wch: 15 }, // State
+      { wch: 15 }, // LGA
+      { wch: 15 }, // Region
+      { wch: 25 }, // Health Facility
+      { wch: 20 }, // Reporting Source
+      { wch: 15 }, // Date of Onset
+      { wch: 18 }, // Date of Confirmation
+      { wch: 30 }, // Symptoms
+      { wch: 30 }, // Risk Factors
+      { wch: 12 }, // Latitude
+      { wch: 12 }, // Longitude
+      { wch: 20 }, // Reported At
+    ];
+    ws["!cols"] = colWidths;
+
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Human Cases");
+
+    // Generate filename with current date
+    const date = new Date().toISOString().split("T")[0];
+    const filename = `Human_Cases_Export_${date}.xlsx`;
+
+    // Save file
+    XLSX.writeFile(wb, filename);
+  };
+
   return (
     <DashboardLayout>
       <div className="flex flex-col gap-6 font-primary">
@@ -337,7 +406,10 @@ function Cases() {
               <Filter className="w-4 h-4" />
               {showFilters ? "Hide Filters" : "Show Filters"}
             </button>
-            <button className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-gray-700 transition">
+            <button
+              onClick={handleExportToExcel}
+              className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-gray-700 transition"
+            >
               <Download className="w-4 h-4" />
               Export
             </button>

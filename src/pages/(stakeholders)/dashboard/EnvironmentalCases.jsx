@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import DashboardLayout from "../../../components/dashboardLayouts/Dashboard";
 import axios from "axios";
 import { Filter, Download, Plus } from "lucide-react";
+import * as XLSX from "xlsx";
 import {
   EnvironmentalCaseStatsCards,
   EnvironmentalCaseFiltersPanel,
@@ -188,6 +189,64 @@ const EnvironmentalCases = () => {
     setShowDetailsModal(true);
   };
 
+  // Handle export to Excel
+  const handleExportToExcel = () => {
+    // Prepare data for export
+    const exportData = filteredCases.map((caseItem) => ({
+      "Case ID": caseItem.case_id,
+      "Environmental Factors": caseItem.environmental_factors,
+      Disease: caseItem.disease,
+      Classification: caseItem.classification,
+      Outcome: caseItem.outcome,
+      State: caseItem.state,
+      LGA: caseItem.lga,
+      Region: caseItem.region,
+      "Sample Collected": caseItem.sample_collected ? "Yes" : "No",
+      "Lab Results": caseItem.lab_results,
+      "Date of Onset": caseItem.date_of_onset,
+      "Date of Confirmation": caseItem.date_of_confirmation,
+      Latitude: caseItem.latitude,
+      Longitude: caseItem.longitude,
+      "Reported At": caseItem.reported_at
+        ? new Date(caseItem.reported_at).toLocaleString()
+        : "",
+    }));
+
+    // Create worksheet
+    const ws = XLSX.utils.json_to_sheet(exportData);
+
+    // Set column widths
+    const colWidths = [
+      { wch: 12 }, // Case ID
+      { wch: 25 }, // Environmental Factors
+      { wch: 20 }, // Disease
+      { wch: 15 }, // Classification
+      { wch: 15 }, // Outcome
+      { wch: 15 }, // State
+      { wch: 15 }, // LGA
+      { wch: 15 }, // Region
+      { wch: 18 }, // Sample Collected
+      { wch: 20 }, // Lab Results
+      { wch: 15 }, // Date of Onset
+      { wch: 18 }, // Date of Confirmation
+      { wch: 12 }, // Latitude
+      { wch: 12 }, // Longitude
+      { wch: 20 }, // Reported At
+    ];
+    ws["!cols"] = colWidths;
+
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Environmental Cases");
+
+    // Generate filename with current date
+    const date = new Date().toISOString().split("T")[0];
+    const filename = `Environmental_Cases_Export_${date}.xlsx`;
+
+    // Save file
+    XLSX.writeFile(wb, filename);
+  };
+
   return (
     <DashboardLayout>
       <div className="flex flex-col gap-6 font-primary">
@@ -247,7 +306,10 @@ const EnvironmentalCases = () => {
                   <Filter className="w-4 h-4" />
                   {showFilters ? "Hide Filters" : "Show Filters"}
                 </button>
-                <button className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-gray-700 transition">
+                <button
+                  onClick={handleExportToExcel}
+                  className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-gray-700 transition"
+                >
                   <Download className="w-4 h-4" />
                   Export
                 </button>

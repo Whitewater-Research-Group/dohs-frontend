@@ -43,9 +43,9 @@ const EnvironmentalCaseStatsCards = ({ cases, totalCases }) => {
                 {stat.label}
               </span>
               <div
-                className={`w-8 h-8 rounded-full bg-${stat.color}-100 flex items-center justify-center`}
+                className={`w-12 h-12 rounded-full bg-${stat.color}-100 flex items-center justify-center`}
               >
-                <Icon className={`w-4 h-4 text-${stat.color}-600`} />
+                <Icon className={`w-6 h-6 text-${stat.color}-600`} />
               </div>
             </div>
             <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
