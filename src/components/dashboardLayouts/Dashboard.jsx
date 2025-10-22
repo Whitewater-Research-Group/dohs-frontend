@@ -109,7 +109,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       icon: Leaf,
       path: "/stakeholder/dashboard/environmental-cases",
     },
-    { title: "Reports", icon: FileText, path: "/reports" },
+    {
+      title: "Reports",
+      icon: FileText,
+      path: "/stakeholder/dashboard/reports",
+    },
     // { title: "Projects", icon: Folder, path: "/projects" },
     // {
     //   title: "Epidemic Reports",

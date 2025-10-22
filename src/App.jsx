@@ -11,7 +11,7 @@ import ResetPassword from "./pages/auth/ResetPassword";
 import ChangePassword from "./pages/auth/ChangePassword";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NonHealthDashboard from "./pages/dashboard/NonHealthDashboard";
-import HealthDashboard from "./pages/dashboard/NonHealthDashboard";
+import HealthDashboard from "./pages/dashboard/HealthDashboard";
 import Home from "./pages/home/Home";
 import About from "./pages/about/About";
 import DiseaseCaseReport from "./pages/report-gen/Disease";
@@ -26,6 +26,7 @@ import InteractiveMap from "./pages/(stakeholders)/dashboard/Gis";
 import Cases from "./pages/(stakeholders)/dashboard/HumanCases";
 import AnimalCases from "./pages/(stakeholders)/dashboard/AnimalCases";
 import EnvironmentalCases from "./pages/(stakeholders)/dashboard/EnvironmentalCases";
+import Reports from "./pages/(stakeholders)/dashboard/Reports";
 
 function App() {
   return (
@@ -71,6 +72,7 @@ function App() {
           path="/stakeholder/dashboard/environmental-cases"
           element={<EnvironmentalCases />}
         />
+        <Route path="/stakeholder/dashboard/reports" element={<Reports />} />
       </Routes>
     </Router>
   );
