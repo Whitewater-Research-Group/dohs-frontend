@@ -9,6 +9,7 @@ import {
   AnimalCaseTableRow,
   AnimalCaseDetailsModal,
 } from "../../../components/cases";
+import AnimalNewCaseModal from "../../../components/cases/AnimalNewCaseModal";
 
 const AnimalCases = () => {
   const [cases, setCases] = useState([]);
@@ -27,6 +28,29 @@ const AnimalCases = () => {
   // Case details modal state
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedCase, setSelectedCase] = useState(null);
+
+  // New case form data
+  const [formData, setFormData] = useState({
+    case_id: "",
+    personID: "",
+    disease: "",
+    classification: "",
+    outcome: "",
+    longitude: 0,
+    latitude: 0,
+    state: "",
+    lga: "",
+    health_facility: "",
+    region: "",
+    date_of_onset: "",
+    date_of_confirmation: "",
+    reporting_source: "",
+    animal_species: "",
+    number_affected: 1,
+    symptoms: "",
+    lab_results: "",
+    category: "Animal",
+  });
 
   const [filters, setFilters] = useState({
     search: "",
@@ -203,6 +227,72 @@ const AnimalCases = () => {
   const handleViewDetails = (caseItem) => {
     setSelectedCase(caseItem);
     setShowDetailsModal(true);
+  };
+
+  // Handle input change for new case form
+  const handleInputChange = (e) => {
+    const { name, value, type } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "number" ? parseFloat(value) || 0 : value,
+    }));
+  };
+
+  // Handle form submission
+  const handleSubmitNewCase = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.post(
+        "https://backend.onehealth-wwrg.com/api/v1/reports/animal",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        alert("Animal case created successfully!");
+        setShowNewCaseModal(false);
+        // Reset form
+        setFormData({
+          case_id: "",
+          personID: "",
+          disease: "",
+          classification: "",
+          outcome: "",
+          longitude: 0,
+          latitude: 0,
+          state: "",
+          lga: "",
+          health_facility: "",
+          region: "",
+          date_of_onset: "",
+          date_of_confirmation: "",
+          reporting_source: "",
+          animal_species: "",
+          number_affected: 1,
+          symptoms: "",
+          lab_results: "",
+          category: "Animal",
+        });
+        // Refresh the cases list
+        await fetchCases(1, apiPageSize);
+      }
+    } catch (error) {
+      console.error("Error creating animal case:", error);
+      alert(
+        error.response?.data?.message ||
+          "Error creating animal case. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Handle opening new case modal
@@ -471,6 +561,16 @@ const AnimalCases = () => {
             </div>
           </>
         )}
+
+        {/* New Animal Case Modal */}
+        <AnimalNewCaseModal
+          isOpen={showNewCaseModal}
+          onClose={() => setShowNewCaseModal(false)}
+          formData={formData}
+          onInputChange={handleInputChange}
+          onSubmit={handleSubmitNewCase}
+          isSubmitting={isSubmitting}
+        />
 
         {/* Animal Case Details Modal */}
         <AnimalCaseDetailsModal
