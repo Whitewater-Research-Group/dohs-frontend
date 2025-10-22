@@ -9,6 +9,7 @@ import {
   EnvironmentalCaseTableRow,
   EnvironmentalCaseDetailsModal,
 } from "../../../components/cases";
+import EnvironmentalNewCaseModal from "../../../components/cases/EnvironmentalNewCaseModal";
 
 const EnvironmentalCases = () => {
   const [cases, setCases] = useState([]);
@@ -27,6 +28,28 @@ const EnvironmentalCases = () => {
   // Case details modal state
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedCase, setSelectedCase] = useState(null);
+
+  // New case form data
+  const [formData, setFormData] = useState({
+    case_id: "",
+    personID: "",
+    disease: "",
+    classification: "",
+    outcome: "",
+    longitude: 0,
+    latitude: 0,
+    state: "",
+    lga: "",
+    health_facility: "",
+    region: "",
+    date_of_onset: "",
+    date_of_confirmation: "",
+    reporting_source: "",
+    environmental_factors: "",
+    sample_collected: true,
+    lab_results: "",
+    category: "Environmental",
+  });
 
   const [filters, setFilters] = useState({
     search: "",
@@ -187,6 +210,76 @@ const EnvironmentalCases = () => {
   const handleViewDetails = (caseItem) => {
     setSelectedCase(caseItem);
     setShowDetailsModal(true);
+  };
+
+  // Handle input change for new case form
+  const handleInputChange = (e) => {
+    const { name, value, type } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        type === "number"
+          ? parseFloat(value) || 0
+          : name === "sample_collected"
+          ? value === "true"
+          : value,
+    }));
+  };
+
+  // Handle form submission
+  const handleSubmitNewCase = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.post(
+        "https://backend.onehealth-wwrg.com/api/v1/reports/env",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200 || response.status === 201) {
+        alert("Environmental case created successfully!");
+        setShowNewCaseModal(false);
+        // Reset form
+        setFormData({
+          case_id: "",
+          personID: "",
+          disease: "",
+          classification: "",
+          outcome: "",
+          longitude: 0,
+          latitude: 0,
+          state: "",
+          lga: "",
+          health_facility: "",
+          region: "",
+          date_of_onset: "",
+          date_of_confirmation: "",
+          reporting_source: "",
+          environmental_factors: "",
+          sample_collected: true,
+          lab_results: "",
+          category: "Environmental",
+        });
+        // Refresh the cases list
+        await fetchCases(1, apiPageSize);
+      }
+    } catch (error) {
+      console.error("Error creating environmental case:", error);
+      alert(
+        error.response?.data?.message ||
+          "Error creating environmental case. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Handle export to Excel
@@ -448,6 +541,16 @@ const EnvironmentalCases = () => {
             </div>
           </>
         )}
+
+        {/* New Environmental Case Modal */}
+        <EnvironmentalNewCaseModal
+          isOpen={showNewCaseModal}
+          onClose={() => setShowNewCaseModal(false)}
+          formData={formData}
+          onInputChange={handleInputChange}
+          onSubmit={handleSubmitNewCase}
+          isSubmitting={isSubmitting}
+        />
 
         {/* Environmental Case Details Modal */}
         <EnvironmentalCaseDetailsModal
