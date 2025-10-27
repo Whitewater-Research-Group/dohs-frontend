@@ -1415,4 +1415,4 @@ export default InteractiveMap;
 //   10) Add a button to import custom GeoJSON data
 //   11) Add a button to clear all markers and layers from the map
 //   12) Add a button to save the current map view (zoom level, center position) for future reference
-//   13) Add icons (with different colrs) for the different disease cases ✅
+//   13) Add icons (with different colors) for the different disease cases ✅
