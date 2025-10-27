@@ -1045,7 +1045,11 @@ function InteractiveMap() {
                 <LayerGroup>
                   {filteredData
                     .filter(
-                      (item) => item.type === "human" && visibleLayers.human
+                      (item) =>
+                        item.type === "human" &&
+                        visibleLayers.human &&
+                        item.lat != null &&
+                        item.lon != null
                     )
                     .map((caseData) => (
                       <Marker
@@ -1095,8 +1099,8 @@ function InteractiveMap() {
                               </div>
                               <div className="text-gray-500">
                                 <strong>Coordinates:</strong>{" "}
-                                {caseData.lat.toFixed(4)},{" "}
-                                {caseData.lon.toFixed(4)}
+                                {caseData.lat?.toFixed(4) ?? "N/A"},{" "}
+                                {caseData.lon?.toFixed(4) ?? "N/A"}
                               </div>
                             </div>
                           </div>
@@ -1111,7 +1115,11 @@ function InteractiveMap() {
                 <LayerGroup>
                   {filteredData
                     .filter(
-                      (item) => item.type === "animal" && visibleLayers.animal
+                      (item) =>
+                        item.type === "animal" &&
+                        visibleLayers.animal &&
+                        item.lat != null &&
+                        item.lon != null
                     )
                     .map((caseData) => (
                       <Marker
@@ -1168,8 +1176,8 @@ function InteractiveMap() {
                               </div>
                               <div className="text-gray-500">
                                 <strong>Coordinates:</strong>{" "}
-                                {caseData.lat.toFixed(4)},{" "}
-                                {caseData.lon.toFixed(4)}
+                                {caseData.lat?.toFixed(4) ?? "N/A"},{" "}
+                                {caseData.lon?.toFixed(4) ?? "N/A"}
                               </div>
                             </div>
                           </div>
@@ -1186,7 +1194,9 @@ function InteractiveMap() {
                     .filter(
                       (item) =>
                         item.type === "environmental" &&
-                        visibleLayers.environmental
+                        visibleLayers.environmental &&
+                        item.lat != null &&
+                        item.lon != null
                     )
                     .map((caseData) => {
                       const circleProps = createImpactCircle(caseData);
@@ -1266,8 +1276,8 @@ function InteractiveMap() {
                                   </div>
                                   <div className="text-gray-500">
                                     <strong>Coordinates:</strong>{" "}
-                                    {caseData.lat.toFixed(4)},{" "}
-                                    {caseData.lon.toFixed(4)}
+                                    {caseData.lat?.toFixed(4) ?? "N/A"},{" "}
+                                    {caseData.lon?.toFixed(4) ?? "N/A"}
                                   </div>
                                 </div>
                               </div>
