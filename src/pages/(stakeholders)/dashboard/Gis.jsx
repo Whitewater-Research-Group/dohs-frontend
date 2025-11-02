@@ -30,6 +30,10 @@ import {
   Eye,
   EyeOff,
   Flame,
+  AlertTriangle,
+  MapPin,
+  Clock,
+  X,
 } from "lucide-react";
 
 // Custom CSS for professional markers
@@ -40,6 +44,14 @@ const markerStyles = `
   }
   .custom-case-marker svg {
     overflow: visible;
+  }
+  @keyframes newAlertPulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.15);
+    }
   }
 `;
 
@@ -81,6 +93,7 @@ function InteractiveMap() {
   const [mapZoom, setMapZoom] = useState(6); // Track current zoom level
   const [scrollWheelZoomEnabled, setScrollWheelZoomEnabled] = useState(false); // Toggle scroll-wheel zoom
   const [showHeatMap, setShowHeatMap] = useState(false); // Toggle heat map view
+  const [newAlertCaseId, setNewAlertCaseId] = useState(null); // Track the new alert case ID for animation
 
   const mapRef = useRef(null);
   const audioRef = useRef(null);
@@ -271,11 +284,13 @@ function InteractiveMap() {
   // Function to show new case notification
   const showNewCaseNotification = (caseData) => {
     setNewCaseAlert(caseData);
+    setNewAlertCaseId(caseData.id); // Set the case ID for marker animation
     playAlertSound();
 
     // Auto-hide notification after 1 minute (60 seconds)
     setTimeout(() => {
       setNewCaseAlert(null);
+      setNewAlertCaseId(null); // Clear the animation marker
       stopAlertSound();
     }, 60000);
   };
@@ -701,7 +716,12 @@ function InteractiveMap() {
 
   // Professional marker system with clean medical/scientific icons
   // Icons scale based on zoom level for better visibility
-  const createCaseIcon = (caseType, severity, zoom = mapZoom) => {
+  const createCaseIcon = (
+    caseType,
+    severity,
+    zoom = mapZoom,
+    isNewAlert = false
+  ) => {
     let iconPath = "";
     let iconColor = "";
     let backgroundColor = "";
@@ -809,6 +829,11 @@ function InteractiveMap() {
         display: flex;
         align-items: center;
         justify-content: center;
+        ${
+          isNewAlert
+            ? "animation: newAlertPulse 1.5s ease-in-out infinite;"
+            : ""
+        }
       ">
         <svg width="${size}" height="${size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -824,13 +849,25 @@ function InteractiveMap() {
             </radialGradient>
           </defs>
           
-          <!-- Outer glow for critical cases -->
+          <!-- Outer glow for critical cases OR new alert -->
           ${
-            severity === "critical"
+            severity === "critical" || isNewAlert
               ? `
             <circle cx="50" cy="50" r="48" fill="none" stroke="${backgroundColor}" stroke-width="4" opacity="0.3">
               <animate attributeName="r" values="48;52;48" dur="2s" repeatCount="indefinite"/>
               <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite"/>
+            </circle>
+          `
+              : ""
+          }
+          
+          <!-- Additional pulsing ring for new alerts -->
+          ${
+            isNewAlert
+              ? `
+            <circle cx="50" cy="50" r="45" fill="none" stroke="#fbbf24" stroke-width="3" opacity="0.6">
+              <animate attributeName="r" values="45;55;45" dur="1.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0;0.6" dur="1.5s" repeatCount="indefinite"/>
             </circle>
           `
               : ""
@@ -875,7 +912,7 @@ function InteractiveMap() {
 
     return L.divIcon({
       html: iconHtml,
-      className: "custom-case-marker",
+      className: `custom-case-marker ${isNewAlert ? "new-alert-marker" : ""}`,
       iconSize: [size, size],
       iconAnchor: [size / 2, size / 2],
       popupAnchor: [0, -size / 2],
@@ -1361,7 +1398,9 @@ function InteractiveMap() {
                           position={[caseData.lat, caseData.lon]}
                           icon={createCaseIcon(
                             caseData.type,
-                            caseData.severity
+                            caseData.severity,
+                            mapZoom,
+                            caseData.id === newAlertCaseId
                           )}
                         >
                           <Popup maxWidth={350}>
@@ -1435,7 +1474,9 @@ function InteractiveMap() {
                           position={[caseData.lat, caseData.lon]}
                           icon={createCaseIcon(
                             caseData.type,
-                            caseData.severity
+                            caseData.severity,
+                            mapZoom,
+                            caseData.id === newAlertCaseId
                           )}
                         >
                           <Popup maxWidth={350}>
@@ -1531,7 +1572,9 @@ function InteractiveMap() {
                               position={[caseData.lat, caseData.lon]}
                               icon={createCaseIcon(
                                 caseData.type,
-                                caseData.severity
+                                caseData.severity,
+                                mapZoom,
+                                caseData.id === newAlertCaseId
                               )}
                             >
                               <Popup maxWidth={350}>
@@ -1604,83 +1647,26 @@ function InteractiveMap() {
           </MapContainer>
         </div>
 
-        {/* New Case Alert Notification */}
+        {/* Professional New Case Alert Notification */}
         {newCaseAlert && (
-          <div
-            className="fixed top-20 right-4 z-[10000]"
-            style={{ animation: "bounce 1s infinite" }}
-          >
-            <div
-              className="bg-red-600 px-6 py-5 rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.8)] max-w-md border-4 border-yellow-400"
-              style={{ backgroundColor: "#dc2626", opacity: 1 }}
-            >
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0">
-                  <div
-                    className="w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center animate-pulse shadow-lg"
-                    style={{ backgroundColor: "#facc15" }}
-                  >
-                    {newCaseAlert.type === "human" && (
-                      <Users className="w-7 h-7 text-red-700" />
-                    )}
-                    {newCaseAlert.type === "animal" && (
-                      <PawPrint className="w-7 h-7 text-green-700" />
-                    )}
-                    {newCaseAlert.type === "environmental" && (
-                      <Leaf className="w-7 h-7 text-emerald-700" />
-                    )}
+          <div className="fixed top-20 right-4 z-[10000] animate-slideIn">
+            <div className="bg-white rounded-lg shadow-2xl max-w-md border-l-8 border-red-600 overflow-hidden">
+              {/* Alert Header with Severity Indicator */}
+              <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="bg-white rounded-full p-2 animate-pulse">
+                    <AlertTriangle
+                      className="w-6 h-6 text-red-600"
+                      strokeWidth={2.5}
+                    />
                   </div>
-                </div>
-                <div className="flex-1">
-                  <h3
-                    className="font-black text-2xl mb-3 tracking-wide"
-                    style={{ color: "#fef08a" }}
-                  >
-                    🚨 NEW CASE ALERT!
-                  </h3>
-                  <p
-                    className="text-lg font-bold mb-4"
-                    style={{ color: "#ffffff" }}
-                  >
-                    {newCaseAlert.message}
-                  </p>
-                  <div
-                    className="text-base space-y-3 bg-red-800 p-4 rounded-lg border-2 border-red-900"
-                    style={{ backgroundColor: "#991b1b" }}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold" style={{ color: "#fde047" }}>
-                        📍 Location:
-                      </span>{" "}
-                      <span
-                        className="font-semibold"
-                        style={{ color: "#f3f4f6" }}
-                      >
-                        {newCaseAlert.state}, {newCaseAlert.lga}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold" style={{ color: "#fde047" }}>
-                        ⚠️ Severity:
-                      </span>{" "}
-                      <span
-                        className="uppercase font-black px-3 py-1 rounded-md"
-                        style={{ color: "#ffffff", backgroundColor: "#ea580c" }}
-                      >
-                        {newCaseAlert.severity}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold" style={{ color: "#fde047" }}>
-                        🕐 Time:
-                      </span>{" "}
-                      <span
-                        className="font-semibold"
-                        style={{ color: "#f3f4f6" }}
-                      >
-                        {new Date().toLocaleTimeString()}
-                      </span>
-                    </div>
+                  <div>
+                    <h3 className="text-white font-bold text-lg tracking-tight">
+                      CRITICAL ALERT
+                    </h3>
+                    <p className="text-red-100 text-xs font-medium">
+                      New Case Detected
+                    </p>
                   </div>
                 </div>
                 <button
@@ -1688,17 +1674,148 @@ function InteractiveMap() {
                     setNewCaseAlert(null);
                     stopAlertSound();
                   }}
-                  className="rounded-full w-10 h-10 flex items-center justify-center font-black text-4xl leading-none transition-all duration-200 hover:scale-110"
-                  style={{
-                    color: "#fef08a",
-                    backgroundColor: "rgba(153, 27, 27, 0.5)",
-                  }}
-                  title="Close alert"
+                  className="bg-white text-red-600 hover:bg-red-50 rounded-lg p-2.5 transition-all flex-shrink-0 hover:scale-110 shadow-lg font-bold"
+                  title="Close Alert"
+                  style={{ minWidth: "44px", minHeight: "44px" }}
                 >
-                  ×
+                  <X className="w-6 h-6" strokeWidth={3} />
                 </button>
               </div>
+
+              {/* Alert Body */}
+              <div className="p-6 bg-gray-50">
+                {/* Case Type Badge */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div
+                    className={`p-3 rounded-lg ${
+                      newCaseAlert.type === "human"
+                        ? "bg-red-100"
+                        : newCaseAlert.type === "animal"
+                        ? "bg-green-100"
+                        : "bg-purple-100"
+                    }`}
+                  >
+                    {newCaseAlert.type === "human" && (
+                      <Users
+                        className={`w-6 h-6 text-red-700`}
+                        strokeWidth={2}
+                      />
+                    )}
+                    {newCaseAlert.type === "animal" && (
+                      <PawPrint
+                        className={`w-6 h-6 text-green-700`}
+                        strokeWidth={2}
+                      />
+                    )}
+                    {newCaseAlert.type === "environmental" && (
+                      <Leaf
+                        className={`w-6 h-6 text-purple-700`}
+                        strokeWidth={2}
+                      />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                      {newCaseAlert.type} Health Case
+                    </p>
+                    <p className="text-gray-900 font-bold text-lg leading-tight">
+                      {newCaseAlert.disease}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Alert Details */}
+                <div className="space-y-3 bg-white rounded-lg p-4 border border-gray-200">
+                  {/* Location */}
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-0.5">
+                        Location
+                      </p>
+                      <p className="text-gray-900 font-semibold">
+                        {newCaseAlert.state}, {newCaseAlert.lga}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Severity */}
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                        Severity Level
+                      </p>
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
+                          newCaseAlert.severity === "critical"
+                            ? "bg-red-100 text-red-800 border border-red-300"
+                            : newCaseAlert.severity === "high"
+                            ? "bg-orange-100 text-orange-800 border border-orange-300"
+                            : newCaseAlert.severity === "medium"
+                            ? "bg-yellow-100 text-yellow-800 border border-yellow-300"
+                            : "bg-green-100 text-green-800 border border-green-300"
+                        }`}
+                      >
+                        {newCaseAlert.severity}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Time */}
+                  <div className="flex items-start gap-3">
+                    <Clock className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-0.5">
+                        Detected At
+                      </p>
+                      <p className="text-gray-900 font-semibold">
+                        {new Date().toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
+                          hour12: true,
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Footer */}
+                <div className="mt-6 pt-4 border-t-2 border-gray-300">
+                  <button
+                    onClick={() => {
+                      setNewCaseAlert(null);
+                      stopAlertSound();
+                    }}
+                    className="w-full px-6 py-4 bg-red-600 hover:bg-red-700 text-white text-base font-bold rounded-lg transition-all hover:shadow-xl flex items-center justify-center gap-3 uppercase tracking-wide"
+                  >
+                    <X className="w-5 h-5" strokeWidth={3} />
+                    Dismiss Alert
+                  </button>
+                  <p className="text-xs text-gray-500 font-medium text-center mt-3">
+                    Case ID: {newCaseAlert.caseId}
+                  </p>
+                </div>
+              </div>
             </div>
+
+            {/* CSS Animation */}
+            <style jsx>{`
+              @keyframes slideIn {
+                from {
+                  transform: translateX(400px);
+                  opacity: 0;
+                }
+                to {
+                  transform: translateX(0);
+                  opacity: 1;
+                }
+              }
+              .animate-slideIn {
+                animation: slideIn 0.3s ease-out;
+              }
+            `}</style>
           </div>
         )}
 
