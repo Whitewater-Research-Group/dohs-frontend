@@ -245,6 +245,43 @@ function Cases() {
     setShowDetailsModal(true);
   };
 
+  // Handle deleting a case
+  const handleDeleteCase = async (caseItem) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete case ${caseItem.case_id}?\n\nPerson ID: ${caseItem.personID}\nDisease: ${caseItem.disease}\n\nThis action cannot be undone.`
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.delete(
+        `https://backend.onehealth-wwrg.com/api/v1/reports/health/${caseItem.case_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200 || response.status === 204) {
+        alert("Case deleted successfully!");
+        // Refresh the cases list
+        await fetchCases(apiCurrentPage, apiPageSize);
+      }
+    } catch (error) {
+      console.error("Error deleting case:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.detail ||
+        "Error deleting case. Please try again.";
+      alert(errorMessage);
+    }
+  };
+
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
@@ -580,6 +617,7 @@ function Cases() {
                         caseItem={caseItem}
                         viewMode={viewMode}
                         onViewDetails={handleViewDetails}
+                        onDelete={handleDeleteCase}
                       />
                     </tr>
                   ))}

@@ -1,7 +1,7 @@
 import React from "react";
 import { Eye, Edit, Trash2 } from "lucide-react";
 
-const CaseTableRow = ({ caseItem, viewMode, onViewDetails }) => {
+const CaseTableRow = ({ caseItem, viewMode, onViewDetails, onDelete }) => {
   if (viewMode === "default") {
     return (
       <>
@@ -91,6 +91,7 @@ const CaseTableRow = ({ caseItem, viewMode, onViewDetails }) => {
             <button
               className="text-red-600 hover:text-red-900 p-1 rounded"
               title="Delete Case"
+              onClick={() => onDelete && onDelete(caseItem)}
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -202,6 +203,7 @@ const CaseTableRow = ({ caseItem, viewMode, onViewDetails }) => {
           <button
             className="text-red-600 hover:text-red-900 p-1 rounded"
             title="Delete Case"
+            onClick={() => onDelete && onDelete(caseItem)}
           >
             <Trash2 className="w-4 h-4" />
           </button>

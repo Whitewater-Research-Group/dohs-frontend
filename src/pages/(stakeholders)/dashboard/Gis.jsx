@@ -597,48 +597,101 @@ function InteractiveMap() {
 
   // Enhanced icon system with case-type specific colors and severity indicators
   const createCaseIcon = (caseType, severity) => {
-    let baseColor = "blue";
-    let size = [25, 41]; // Default size
+    let iconSymbol = "";
+    let backgroundColor = "";
+    let size = 40; // Base size
 
-    // Primary color based on case type
+    // Determine icon symbol (per case type) and use a unified
+    // severity -> color scale for all case types so markers are
+    // visually consistent across human/animal/environmental.
     switch (caseType) {
       case "human":
-        baseColor = "blue";
+        iconSymbol = "⚕️"; // Medical symbol
         break;
       case "animal":
-        baseColor = "green";
+        iconSymbol = "🐾"; // Paw print
         break;
       case "environmental":
-        baseColor = "violet"; // Using violet for environmental
+        iconSymbol = "☣️"; // Biohazard
         break;
       default:
-        baseColor = "grey";
+        iconSymbol = "📍";
     }
 
-    // Adjust marker size based on severity for additional visual cue
+    // Unified severity color scale (applies to all case types)
     switch (severity) {
       case "critical":
-        size = [35, 51]; // Larger for critical cases
+        backgroundColor = "#dc2626"; // strong red
+        size = 50;
         break;
       case "high":
-        size = [30, 46]; // Medium-large for high severity
+        backgroundColor = "#f87171"; // lighter red
+        size = 45;
         break;
       case "medium":
-        size = [25, 41]; // Standard size
+        backgroundColor = "#fb923c"; // orange
+        size = 40;
         break;
       case "low":
-        size = [20, 31]; // Smaller for low severity
+        backgroundColor = "#fbbf24"; // yellow
+        size = 35;
         break;
+      default:
+        backgroundColor = "#6b7280"; // neutral gray
     }
 
-    return new L.Icon({
-      iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${baseColor}.png`,
-      iconSize: size,
-      iconAnchor: [size[0] / 2, size[1]],
-      popupAnchor: [1, -size[1] + 10],
-      shadowUrl:
-        "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-      shadowSize: [size[0] + 16, size[1]],
+    // Create custom div icon with SVG
+    const iconHtml = `
+      <div style="
+        position: relative;
+        width: ${size}px;
+        height: ${size}px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      ">
+        <svg width="${size}" height="${size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <!-- Drop shadow -->
+          <defs>
+            <filter id="shadow-${caseType}-${severity}" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+              <feOffset dx="0" dy="2" result="offsetblur"/>
+              <feComponentTransfer>
+                <feFuncA type="linear" slope="0.3"/>
+              </feComponentTransfer>
+              <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          
+          <!-- Outer circle with border -->
+          <circle cx="50" cy="50" r="45" fill="${backgroundColor}" stroke="white" stroke-width="3" filter="url(#shadow-${caseType}-${severity})"/>
+          
+          <!-- Icon symbol -->
+          <text x="50" y="50" font-size="40" text-anchor="middle" dominant-baseline="central" fill="white">
+            ${iconSymbol}
+          </text>
+          
+          <!-- Severity indicator ring for critical cases -->
+          ${
+            severity === "critical"
+              ? `<circle cx="50" cy="50" r="46" fill="none" stroke="#fef2f2" stroke-width="2" stroke-dasharray="5,5">
+                  <animate attributeName="stroke-dashoffset" from="0" to="20" dur="2s" repeatCount="indefinite"/>
+                </circle>`
+              : ""
+          }
+        </svg>
+      </div>
+    `;
+
+    return L.divIcon({
+      html: iconHtml,
+      className: "custom-case-marker",
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2],
+      popupAnchor: [0, -size / 2],
     });
   };
 
