@@ -663,6 +663,33 @@ function InteractiveMap() {
       }
     }, [map, scrollWheelZoomEnabled]);
 
+    // Fix popup panning issue - ensure map remains draggable after popup opens
+    useEffect(() => {
+      // Ensure dragging is always enabled
+      map.dragging.enable();
+
+      // Handle popup open events
+      const handlePopupOpen = () => {
+        // Re-enable dragging and zooming after popup opens
+        setTimeout(() => {
+          map.dragging.enable();
+          map.touchZoom.enable();
+          map.doubleClickZoom.enable();
+          map.boxZoom.enable();
+          map.keyboard.enable();
+          if (scrollWheelZoomEnabled) {
+            map.scrollWheelZoom.enable();
+          }
+        }, 100);
+      };
+
+      map.on("popupopen", handlePopupOpen);
+
+      return () => {
+        map.off("popupopen", handlePopupOpen);
+      };
+    }, [map, scrollWheelZoomEnabled]);
+
     return null;
   };
 
@@ -1039,11 +1066,17 @@ function InteractiveMap() {
                   {stats.total}
                 </div>
                 <div className="text-xs text-blue-100 mt-1 flex items-center gap-1">
-                  <div className={`w-2 h-2 rounded-full ${humanCasesData.length > 0 ? 'bg-green-300 animate-pulse' : 'bg-gray-300'}`}></div>
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      humanCasesData.length > 0
+                        ? "bg-green-300 animate-pulse"
+                        : "bg-gray-300"
+                    }`}
+                  ></div>
                   {humanCasesData.length > 0 ? "Live Data" : "No Data"}
                 </div>
               </div>
-              
+
               <div className="bg-white border border-gray-200 px-4 py-3 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-1">
                   <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
@@ -1054,11 +1087,9 @@ function InteractiveMap() {
                 <div className="text-2xl font-bold text-gray-800">
                   {stats.human}
                 </div>
-                <div className="text-xs text-gray-500 mt-1">
-                  Health Cases
-                </div>
+                <div className="text-xs text-gray-500 mt-1">Health Cases</div>
               </div>
-              
+
               <div className="bg-white border border-gray-200 px-4 py-3 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-1">
                   <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
@@ -1073,7 +1104,7 @@ function InteractiveMap() {
                   Veterinary Cases
                 </div>
               </div>
-              
+
               <div className="bg-white border border-gray-200 px-4 py-3 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-1">
                   <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
@@ -1088,7 +1119,7 @@ function InteractiveMap() {
                   Eco-Health Cases
                 </div>
               </div>
-              
+
               <div className="bg-orange-500 px-4 py-3 rounded-lg shadow-md hover:shadow-lg transition-shadow">
                 <div className="flex items-center justify-between mb-1">
                   <div className="text-xs text-orange-100 font-semibold uppercase tracking-wide">
@@ -1111,12 +1142,8 @@ function InteractiveMap() {
                   </div>
                   <MapPin className="w-4 h-4 text-gray-300" />
                 </div>
-                <div className="text-2xl font-bold text-white">
-                  {mapZoom}
-                </div>
-                <div className="text-xs text-gray-300 mt-1">
-                  Max: 18
-                </div>
+                <div className="text-2xl font-bold text-white">{mapZoom}</div>
+                <div className="text-xs text-gray-300 mt-1">Max: 18</div>
               </div>
             </div>
 
@@ -1177,13 +1204,16 @@ function InteractiveMap() {
                 <span className="text-sm font-semibold text-gray-700">
                   Filters & Search
                 </span>
-                {(activeFilters.caseType !== 'all' || activeFilters.severity !== 'all' || activeFilters.status !== 'all' || searchTerm) && (
+                {(activeFilters.caseType !== "all" ||
+                  activeFilters.severity !== "all" ||
+                  activeFilters.status !== "all" ||
+                  searchTerm) && (
                   <span className="ml-2 px-2 py-0.5 bg-blue-500 text-white text-xs font-bold rounded-full">
                     Active
                   </span>
                 )}
               </div>
-              
+
               <div className="flex flex-wrap items-center gap-3">
                 <div className="relative flex-1 min-w-[300px]">
                   <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -1301,13 +1331,15 @@ function InteractiveMap() {
                     <div className="bg-blue-100 p-1.5 rounded">
                       <Users className="w-4 h-4 text-blue-600" />
                     </div>
-                    <span className="text-sm font-medium text-gray-700">Human Cases</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      Human Cases
+                    </span>
                     <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-bold">
                       {stats.human}
                     </span>
                   </div>
                 </label>
-                
+
                 <label className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                   <input
                     type="checkbox"
@@ -1324,13 +1356,15 @@ function InteractiveMap() {
                     <div className="bg-gray-100 p-1.5 rounded">
                       <PawPrint className="w-4 h-4 text-gray-600" />
                     </div>
-                    <span className="text-sm font-medium text-gray-700">Animal Cases</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      Animal Cases
+                    </span>
                     <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-bold">
                       {stats.animal}
                     </span>
                   </div>
                 </label>
-                
+
                 <label className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                   <input
                     type="checkbox"
@@ -1347,7 +1381,9 @@ function InteractiveMap() {
                     <div className="bg-purple-100 p-1.5 rounded">
                       <Leaf className="w-4 h-4 text-purple-600" />
                     </div>
-                    <span className="text-sm font-medium text-gray-700">Environmental</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      Environmental
+                    </span>
                     <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-bold">
                       {stats.environmental}
                     </span>
@@ -1366,8 +1402,12 @@ function InteractiveMap() {
                         <Flame className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <div className="font-bold text-orange-900 text-sm">Heat Map Active</div>
-                        <div className="text-xs text-orange-700">Disease concentration density visualization</div>
+                        <div className="font-bold text-orange-900 text-sm">
+                          Heat Map Active
+                        </div>
+                        <div className="text-xs text-orange-700">
+                          Disease concentration density visualization
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -1396,28 +1436,36 @@ function InteractiveMap() {
                     <div className="w-8 h-8 bg-red-600 rounded-lg shadow-md flex items-center justify-center">
                       <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
                     </div>
-                    <span className="text-sm font-medium text-gray-700">Critical</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      Critical
+                    </span>
                     <span className="text-xs text-gray-500">(40px)</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-7 h-7 bg-orange-500 rounded-lg shadow-md flex items-center justify-center">
                       <div className="w-2 h-2 bg-white rounded-full"></div>
                     </div>
-                    <span className="text-sm font-medium text-gray-700">High</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      High
+                    </span>
                     <span className="text-xs text-gray-500">(36px)</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-6 h-6 bg-orange-400 rounded-lg shadow-md flex items-center justify-center">
                       <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                     </div>
-                    <span className="text-sm font-medium text-gray-700">Medium</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      Medium
+                    </span>
                     <span className="text-xs text-gray-500">(32px)</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-5 h-5 bg-yellow-400 rounded-lg shadow-md flex items-center justify-center">
                       <div className="w-1 h-1 bg-amber-900 rounded-full"></div>
                     </div>
-                    <span className="text-sm font-medium text-gray-700">Low</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      Low
+                    </span>
                     <span className="text-xs text-gray-500">(28px)</span>
                   </div>
                 </div>
@@ -1430,29 +1478,309 @@ function InteractiveMap() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg shadow-md flex items-center justify-center">
-                      <Users className="w-4 h-4 text-white" />
+                    <div className="w-10 h-10">
+                      <svg
+                        width="40"
+                        height="40"
+                        viewBox="0 0 100 100"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <defs>
+                          <filter
+                            id="shadow-human"
+                            x="-50%"
+                            y="-50%"
+                            width="200%"
+                            height="200%"
+                          >
+                            <feDropShadow
+                              dx="0"
+                              dy="2"
+                              stdDeviation="3"
+                              floodOpacity="0.4"
+                            />
+                          </filter>
+                          <radialGradient id="gradient-human">
+                            <stop
+                              offset="0%"
+                              stopColor="#dc2626"
+                              stopOpacity="1"
+                            />
+                            <stop
+                              offset="100%"
+                              stopColor="#991b1b"
+                              stopOpacity="1"
+                            />
+                          </radialGradient>
+                        </defs>
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="url(#gradient-human)"
+                          stroke="#991b1b"
+                          strokeWidth="3"
+                          filter="url(#shadow-human)"
+                        />
+                        <g transform="translate(50, 50)">
+                          <rect
+                            x="-3"
+                            y="-12"
+                            width="6"
+                            height="24"
+                            fill="#ffffff"
+                            rx="1"
+                          />
+                          <rect
+                            x="-12"
+                            y="-3"
+                            width="24"
+                            height="6"
+                            fill="#ffffff"
+                            rx="1"
+                          />
+                          <circle
+                            cx="0"
+                            cy="0"
+                            r="14"
+                            fill="none"
+                            stroke="#ffffff"
+                            strokeWidth="2"
+                          />
+                        </g>
+                      </svg>
                     </div>
-                    <span className="text-sm font-medium text-gray-700">Human Health</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      Human Health
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-gray-500 rounded-lg shadow-md flex items-center justify-center">
-                      <PawPrint className="w-4 h-4 text-white" />
+                    <div className="w-10 h-10">
+                      <svg
+                        width="40"
+                        height="40"
+                        viewBox="0 0 100 100"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <defs>
+                          <filter
+                            id="shadow-animal"
+                            x="-50%"
+                            y="-50%"
+                            width="200%"
+                            height="200%"
+                          >
+                            <feDropShadow
+                              dx="0"
+                              dy="2"
+                              stdDeviation="3"
+                              floodOpacity="0.4"
+                            />
+                          </filter>
+                          <radialGradient id="gradient-animal">
+                            <stop
+                              offset="0%"
+                              stopColor="#10b981"
+                              stopOpacity="1"
+                            />
+                            <stop
+                              offset="100%"
+                              stopColor="#059669"
+                              stopOpacity="1"
+                            />
+                          </radialGradient>
+                        </defs>
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="url(#gradient-animal)"
+                          stroke="#059669"
+                          strokeWidth="3"
+                          filter="url(#shadow-animal)"
+                        />
+                        <g transform="translate(50, 50)">
+                          <ellipse
+                            cx="0"
+                            cy="2"
+                            rx="8"
+                            ry="10"
+                            fill="#ffffff"
+                          />
+                          <circle cx="-7" cy="-6" r="4" fill="#ffffff" />
+                          <circle cx="0" cy="-8" r="4" fill="#ffffff" />
+                          <circle cx="7" cy="-6" r="4" fill="#ffffff" />
+                          <rect
+                            x="-1.5"
+                            y="-2"
+                            width="3"
+                            height="8"
+                            fill="#10b981"
+                            rx="0.5"
+                          />
+                          <rect
+                            x="-4"
+                            y="1.5"
+                            width="8"
+                            height="3"
+                            fill="#10b981"
+                            rx="0.5"
+                          />
+                        </g>
+                      </svg>
                     </div>
-                    <span className="text-sm font-medium text-gray-700">Animal Health</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      Animal Health
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-purple-500 rounded-lg shadow-md flex items-center justify-center">
-                      <Leaf className="w-4 h-4 text-white" />
+                    <div className="w-10 h-10">
+                      <svg
+                        width="40"
+                        height="40"
+                        viewBox="0 0 100 100"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <defs>
+                          <filter
+                            id="shadow-env"
+                            x="-50%"
+                            y="-50%"
+                            width="200%"
+                            height="200%"
+                          >
+                            <feDropShadow
+                              dx="0"
+                              dy="2"
+                              stdDeviation="3"
+                              floodOpacity="0.4"
+                            />
+                          </filter>
+                          <radialGradient id="gradient-env">
+                            <stop
+                              offset="0%"
+                              stopColor="#8b5cf6"
+                              stopOpacity="1"
+                            />
+                            <stop
+                              offset="100%"
+                              stopColor="#7c3aed"
+                              stopOpacity="1"
+                            />
+                          </radialGradient>
+                        </defs>
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="url(#gradient-env)"
+                          stroke="#7c3aed"
+                          strokeWidth="3"
+                          filter="url(#shadow-env)"
+                        />
+                        <g transform="translate(50, 50)">
+                          <circle cx="0" cy="0" r="3" fill="#ffffff" />
+                          <g transform="rotate(0)">
+                            <path
+                              d="M 0,-3 C -4,-8 -8,-8 -10,-4 L -5,-2 C -3,-4 -2,-4 0,-3 Z"
+                              fill="#ffffff"
+                            />
+                            <circle cx="-9" cy="-5" r="3" fill="#ffffff" />
+                          </g>
+                          <g transform="rotate(120)">
+                            <path
+                              d="M 0,-3 C -4,-8 -8,-8 -10,-4 L -5,-2 C -3,-4 -2,-4 0,-3 Z"
+                              fill="#ffffff"
+                            />
+                            <circle cx="-9" cy="-5" r="3" fill="#ffffff" />
+                          </g>
+                          <g transform="rotate(240)">
+                            <path
+                              d="M 0,-3 C -4,-8 -8,-8 -10,-4 L -5,-2 C -3,-4 -2,-4 0,-3 Z"
+                              fill="#ffffff"
+                            />
+                            <circle cx="-9" cy="-5" r="3" fill="#ffffff" />
+                          </g>
+                        </g>
+                      </svg>
                     </div>
-                    <span className="text-sm font-medium text-gray-700">Environmental</span>
+                    <span className="text-sm font-medium text-gray-700">
+                      Environmental
+                    </span>
                   </div>
                   <div className="flex items-center gap-3 mt-3 pt-3 border-t border-gray-200">
-                    <div className="relative">
-                      <div className="w-8 h-8 bg-orange-500 rounded-lg shadow-md animate-pulse"></div>
-                      <div className="absolute inset-0 bg-yellow-300 rounded-lg opacity-50 animate-ping"></div>
+                    <div className="relative w-10 h-10">
+                      <svg
+                        width="40"
+                        height="40"
+                        viewBox="0 0 100 100"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="animate-pulse"
+                      >
+                        <defs>
+                          <radialGradient id="gradient-alert">
+                            <stop
+                              offset="0%"
+                              stopColor="#fb923c"
+                              stopOpacity="1"
+                            />
+                            <stop
+                              offset="100%"
+                              stopColor="#ea580c"
+                              stopOpacity="1"
+                            />
+                          </radialGradient>
+                        </defs>
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="48"
+                          fill="none"
+                          stroke="#fb923c"
+                          strokeWidth="4"
+                          opacity="0.3"
+                        >
+                          <animate
+                            attributeName="r"
+                            values="48;52;48"
+                            dur="2s"
+                            repeatCount="indefinite"
+                          />
+                          <animate
+                            attributeName="opacity"
+                            values="0.3;0;0.3"
+                            dur="2s"
+                            repeatCount="indefinite"
+                          />
+                        </circle>
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="40"
+                          fill="url(#gradient-alert)"
+                          stroke="#ea580c"
+                          strokeWidth="3"
+                        />
+                        <circle cx="50" cy="80" r="3" fill="#ffffff" />
+                        <circle
+                          cx="44"
+                          cy="78"
+                          r="2"
+                          fill="#ffffff"
+                          opacity="0.7"
+                        />
+                        <circle
+                          cx="56"
+                          cy="78"
+                          r="2"
+                          fill="#ffffff"
+                          opacity="0.7"
+                        />
+                      </svg>
                     </div>
-                    <span className="text-sm font-medium text-orange-700">New Alert (Pulsing)</span>
+                    <span className="text-sm font-medium text-orange-700">
+                      New Alert (Pulsing)
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1550,7 +1878,13 @@ function InteractiveMap() {
                             caseData.id === newAlertCaseId
                           )}
                         >
-                          <Popup maxWidth={350}>
+                          <Popup
+                            maxWidth={350}
+                            autoPan={true}
+                            autoPanPadding={[50, 50]}
+                            closeButton={true}
+                            keepInView={true}
+                          >
                             <div className="p-3">
                               <h3 className="font-bold text-lg mb-2 text-red-800">
                                 <Users className="w-5 h-5 inline mr-2" />
@@ -1626,7 +1960,13 @@ function InteractiveMap() {
                             caseData.id === newAlertCaseId
                           )}
                         >
-                          <Popup maxWidth={350}>
+                          <Popup
+                            maxWidth={350}
+                            autoPan={true}
+                            autoPanPadding={[50, 50]}
+                            closeButton={true}
+                            keepInView={true}
+                          >
                             <div className="p-3">
                               <h3 className="font-bold text-lg mb-2 text-green-800">
                                 <PawPrint className="w-5 h-5 inline mr-2" />
@@ -1724,7 +2064,13 @@ function InteractiveMap() {
                                 caseData.id === newAlertCaseId
                               )}
                             >
-                              <Popup maxWidth={350}>
+                              <Popup
+                                maxWidth={350}
+                                autoPan={true}
+                                autoPanPadding={[50, 50]}
+                                closeButton={true}
+                                keepInView={true}
+                              >
                                 <div className="p-3">
                                   <h3 className="font-bold text-lg mb-2 text-purple-800">
                                     <Leaf className="w-5 h-5 inline mr-2" />
@@ -1977,17 +2323,3 @@ function InteractiveMap() {
 }
 
 export default InteractiveMap;
-
-// TODO: Add the following features to the map
-//   1) Display information on Nigeria states when clicked/hovered on
-//   2) Add a legend to the map to explain the color coding of states
-//   3) Add a search functionality to find specific locations or states
-//   4) Add a button to reset the map view to the default state
-//   6) Add a button to download the map as an image or PDF
-//   7) Add a button to print the map
-//   8) Add a button to share the map on social media
-//   9) Add a button to export the map data as CSV or JSON
-//   10) Add a button to import custom GeoJSON data
-//   11) Add a button to clear all markers and layers from the map
-//   12) Add a button to save the current map view (zoom level, center position) for future reference
-//   13) Add icons (with different colors) for the different disease cases ✅
