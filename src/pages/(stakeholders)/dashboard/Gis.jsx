@@ -17,6 +17,7 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import "leaflet.heat";
 import nigeriaGeoJson from "../../../geodata.json";
 import {
   Search,
@@ -28,7 +29,26 @@ import {
   BarChart3,
   Eye,
   EyeOff,
+  Flame,
 } from "lucide-react";
+
+// Custom CSS for professional markers
+const markerStyles = `
+  .custom-case-marker {
+    background: transparent !important;
+    border: none !important;
+  }
+  .custom-case-marker svg {
+    overflow: visible;
+  }
+`;
+
+// Inject styles
+if (typeof document !== "undefined") {
+  const styleSheet = document.createElement("style");
+  styleSheet.innerText = markerStyles;
+  document.head.appendChild(styleSheet);
+}
 
 // All case data (human, animal, environmental) will be fetched from API
 
@@ -58,6 +78,9 @@ function InteractiveMap() {
     animal: 0,
     environmental: 0,
   });
+  const [mapZoom, setMapZoom] = useState(6); // Track current zoom level
+  const [scrollWheelZoomEnabled, setScrollWheelZoomEnabled] = useState(false); // Toggle scroll-wheel zoom
+  const [showHeatMap, setShowHeatMap] = useState(false); // Toggle heat map view
 
   const mapRef = useRef(null);
   const audioRef = useRef(null);
@@ -595,52 +618,189 @@ function InteractiveMap() {
     opacity: 1,
   });
 
-  // Enhanced icon system with case-type specific colors and severity indicators
-  const createCaseIcon = (caseType, severity) => {
-    let iconSymbol = "";
-    let backgroundColor = "";
-    let size = 40; // Base size
+  // Component to track map zoom level and handle scroll wheel zoom toggle
+  const ZoomHandler = () => {
+    const map = useMap();
 
-    // Determine icon symbol (per case type) and use a unified
-    // severity -> color scale for all case types so markers are
-    // visually consistent across human/animal/environmental.
-    switch (caseType) {
-      case "human":
-        iconSymbol = "⚕️"; // Medical symbol
-        break;
-      case "animal":
-        iconSymbol = "🐾"; // Paw print
-        break;
-      case "environmental":
-        iconSymbol = "☣️"; // Biohazard
-        break;
-      default:
-        iconSymbol = "📍";
-    }
+    useEffect(() => {
+      const handleZoom = () => {
+        setMapZoom(map.getZoom());
+      };
+
+      map.on("zoomend", handleZoom);
+
+      return () => {
+        map.off("zoomend", handleZoom);
+      };
+    }, [map]);
+
+    // Enable/disable scroll wheel zoom based on state
+    useEffect(() => {
+      if (scrollWheelZoomEnabled) {
+        map.scrollWheelZoom.enable();
+      } else {
+        map.scrollWheelZoom.disable();
+      }
+    }, [map, scrollWheelZoomEnabled]);
+
+    return null;
+  };
+
+  // Heat Map Component
+  const HeatMapLayer = ({ data }) => {
+    const map = useMap();
+
+    useEffect(() => {
+      if (!data || data.length === 0) return;
+
+      // Prepare heat map data: [lat, lng, intensity]
+      const heatData = data
+        .filter((item) => item.lat != null && item.lon != null)
+        .map((item) => {
+          // Intensity based on severity: critical=1.0, high=0.75, medium=0.5, low=0.25
+          let intensity = 0.5;
+          switch (item.severity) {
+            case "critical":
+              intensity = 1.0;
+              break;
+            case "high":
+              intensity = 0.75;
+              break;
+            case "medium":
+              intensity = 0.5;
+              break;
+            case "low":
+              intensity = 0.25;
+              break;
+          }
+          return [item.lat, item.lon, intensity];
+        });
+
+      // Create heat layer with custom gradient
+      const heatLayer = L.heatLayer(heatData, {
+        radius: 25,
+        blur: 15,
+        maxZoom: 13,
+        max: 1.0,
+        gradient: {
+          0.0: "#fbbf24", // yellow (low)
+          0.4: "#fb923c", // orange (medium)
+          0.6: "#f87171", // light red (high)
+          0.8: "#dc2626", // strong red (critical)
+          1.0: "#991b1b", // dark red (very critical)
+        },
+      }).addTo(map);
+
+      return () => {
+        map.removeLayer(heatLayer);
+      };
+    }, [map, data]);
+
+    return null;
+  };
+
+  // Professional marker system with clean medical/scientific icons
+  // Icons scale based on zoom level for better visibility
+  const createCaseIcon = (caseType, severity, zoom = mapZoom) => {
+    let iconPath = "";
+    let iconColor = "";
+    let backgroundColor = "";
+    let borderColor = "";
+
+    // Calculate zoom scale factor (zoom levels 5-18, scale 0.6x to 2.0x)
+    const zoomScale = Math.max(0.6, Math.min(2.0, 0.6 + (zoom - 5) * 0.1));
+
+    // Base sizes for different severities (will be multiplied by zoomScale)
+    let baseSize = 32;
 
     // Unified severity color scale (applies to all case types)
     switch (severity) {
       case "critical":
         backgroundColor = "#dc2626"; // strong red
-        size = 50;
+        borderColor = "#991b1b"; // darker red border
+        iconColor = "#ffffff"; // white icon
+        baseSize = 40;
         break;
       case "high":
         backgroundColor = "#f87171"; // lighter red
-        size = 45;
+        borderColor = "#dc2626"; // red border
+        iconColor = "#ffffff";
+        baseSize = 36;
         break;
       case "medium":
         backgroundColor = "#fb923c"; // orange
-        size = 40;
+        borderColor = "#ea580c"; // darker orange border
+        iconColor = "#ffffff";
+        baseSize = 32;
         break;
       case "low":
         backgroundColor = "#fbbf24"; // yellow
-        size = 35;
+        borderColor = "#f59e0b"; // darker yellow border
+        iconColor = "#78350f"; // dark brown icon
+        baseSize = 28;
         break;
       default:
         backgroundColor = "#6b7280"; // neutral gray
+        borderColor = "#4b5563";
+        iconColor = "#ffffff";
     }
 
-    // Create custom div icon with SVG
+    // Professional SVG icon paths for each case type
+    switch (caseType) {
+      case "human":
+        // Medical cross icon (professional medical symbol)
+        iconPath = `
+          <g transform="translate(50, 50)">
+            <rect x="-3" y="-12" width="6" height="24" fill="${iconColor}" rx="1"/>
+            <rect x="-12" y="-3" width="24" height="6" fill="${iconColor}" rx="1"/>
+            <circle cx="0" cy="0" r="14" fill="none" stroke="${iconColor}" stroke-width="2"/>
+          </g>
+        `;
+        break;
+      case "animal":
+        // Veterinary symbol (paw with medical cross)
+        iconPath = `
+          <g transform="translate(50, 50)">
+            <!-- Paw pad -->
+            <ellipse cx="0" cy="2" rx="8" ry="10" fill="${iconColor}"/>
+            <!-- Toes -->
+            <circle cx="-7" cy="-6" r="4" fill="${iconColor}"/>
+            <circle cx="0" cy="-8" r="4" fill="${iconColor}"/>
+            <circle cx="7" cy="-6" r="4" fill="${iconColor}"/>
+            <!-- Small cross overlay -->
+            <rect x="-1.5" y="-2" width="3" height="8" fill="${backgroundColor}" rx="0.5"/>
+            <rect x="-4" y="1.5" width="8" height="3" fill="${backgroundColor}" rx="0.5"/>
+          </g>
+        `;
+        break;
+      case "environmental":
+        // Biohazard symbol (professional version)
+        iconPath = `
+          <g transform="translate(50, 50)">
+            <circle cx="0" cy="0" r="3" fill="${iconColor}"/>
+            <g transform="rotate(0)">
+              <path d="M 0,-3 C -4,-8 -8,-8 -10,-4 L -5,-2 C -3,-4 -2,-4 0,-3 Z" fill="${iconColor}"/>
+              <circle cx="-9" cy="-5" r="3" fill="${iconColor}"/>
+            </g>
+            <g transform="rotate(120)">
+              <path d="M 0,-3 C -4,-8 -8,-8 -10,-4 L -5,-2 C -3,-4 -2,-4 0,-3 Z" fill="${iconColor}"/>
+              <circle cx="-9" cy="-5" r="3" fill="${iconColor}"/>
+            </g>
+            <g transform="rotate(240)">
+              <path d="M 0,-3 C -4,-8 -8,-8 -10,-4 L -5,-2 C -3,-4 -2,-4 0,-3 Z" fill="${iconColor}"/>
+              <circle cx="-9" cy="-5" r="3" fill="${iconColor}"/>
+            </g>
+          </g>
+        `;
+        break;
+      default:
+        iconPath = `<circle cx="50" cy="50" r="8" fill="${iconColor}"/>`;
+    }
+
+    // Apply zoom scaling to final size
+    const size = Math.round(baseSize * zoomScale);
+
+    // Create professional marker with clean design
     const iconHtml = `
       <div style="
         position: relative;
@@ -651,35 +811,62 @@ function InteractiveMap() {
         justify-content: center;
       ">
         <svg width="${size}" height="${size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <!-- Drop shadow -->
           <defs>
-            <filter id="shadow-${caseType}-${severity}" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
-              <feOffset dx="0" dy="2" result="offsetblur"/>
-              <feComponentTransfer>
-                <feFuncA type="linear" slope="0.3"/>
-              </feComponentTransfer>
-              <feMerge>
-                <feMergeNode/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
+            <!-- Professional drop shadow -->
+            <filter id="shadow-${caseType}-${severity}-${size}" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.4"/>
             </filter>
+            
+            <!-- Gradient for depth -->
+            <radialGradient id="gradient-${caseType}-${severity}-${size}">
+              <stop offset="0%" stop-color="${backgroundColor}" stop-opacity="1"/>
+              <stop offset="100%" stop-color="${borderColor}" stop-opacity="1"/>
+            </radialGradient>
           </defs>
           
-          <!-- Outer circle with border -->
-          <circle cx="50" cy="50" r="45" fill="${backgroundColor}" stroke="white" stroke-width="3" filter="url(#shadow-${caseType}-${severity})"/>
-          
-          <!-- Icon symbol -->
-          <text x="50" y="50" font-size="40" text-anchor="middle" dominant-baseline="central" fill="white">
-            ${iconSymbol}
-          </text>
-          
-          <!-- Severity indicator ring for critical cases -->
+          <!-- Outer glow for critical cases -->
           ${
             severity === "critical"
-              ? `<circle cx="50" cy="50" r="46" fill="none" stroke="#fef2f2" stroke-width="2" stroke-dasharray="5,5">
-                  <animate attributeName="stroke-dashoffset" from="0" to="20" dur="2s" repeatCount="indefinite"/>
-                </circle>`
+              ? `
+            <circle cx="50" cy="50" r="48" fill="none" stroke="${backgroundColor}" stroke-width="4" opacity="0.3">
+              <animate attributeName="r" values="48;52;48" dur="2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite"/>
+            </circle>
+          `
+              : ""
+          }
+          
+          <!-- Main marker circle with gradient -->
+          <circle 
+            cx="50" 
+            cy="50" 
+            r="40" 
+            fill="url(#gradient-${caseType}-${severity}-${size})" 
+            stroke="${borderColor}" 
+            stroke-width="3"
+            filter="url(#shadow-${caseType}-${severity}-${size})"
+          />
+          
+          <!-- Icon -->
+          ${iconPath}
+          
+          <!-- Severity indicator dots -->
+          ${
+            severity === "critical"
+              ? `
+            <circle cx="50" cy="80" r="3" fill="${iconColor}"/>
+            <circle cx="44" cy="78" r="2" fill="${iconColor}" opacity="0.7"/>
+            <circle cx="56" cy="78" r="2" fill="${iconColor}" opacity="0.7"/>
+          `
+              : severity === "high"
+              ? `
+            <circle cx="50" cy="80" r="2.5" fill="${iconColor}"/>
+            <circle cx="44" cy="78" r="2" fill="${iconColor}" opacity="0.7"/>
+          `
+              : severity === "medium"
+              ? `
+            <circle cx="50" cy="80" r="2" fill="${iconColor}"/>
+          `
               : ""
           }
         </svg>
@@ -831,6 +1018,38 @@ function InteractiveMap() {
               </div>
 
               <div className="flex gap-2">
+                <button
+                  onClick={() => setShowHeatMap(!showHeatMap)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                    showHeatMap
+                      ? "bg-orange-100 text-orange-700 hover:bg-orange-200"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                  title={showHeatMap ? "Heat Map: ON" : "Heat Map: OFF"}
+                >
+                  <Flame className="w-4 h-4" />
+                  {showHeatMap ? "Heat Map: ON" : "Heat Map: OFF"}
+                </button>
+                <button
+                  onClick={() =>
+                    setScrollWheelZoomEnabled(!scrollWheelZoomEnabled)
+                  }
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                    scrollWheelZoomEnabled
+                      ? "bg-green-100 text-green-700 hover:bg-green-200"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                  title={
+                    scrollWheelZoomEnabled
+                      ? "Scroll Zoom: ON"
+                      : "Scroll Zoom: OFF"
+                  }
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  {scrollWheelZoomEnabled
+                    ? "Scroll Zoom: ON"
+                    : "Scroll Zoom: OFF"}
+                </button>
                 <button
                   onClick={refreshAllData}
                   className="flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
@@ -986,6 +1205,30 @@ function InteractiveMap() {
 
             {/* Enhanced Legend */}
             <div className="mt-4 border-t pt-3 space-y-3">
+              {showHeatMap && (
+                <div className="flex items-center gap-6 text-sm bg-orange-50 p-2 rounded-lg border border-orange-200">
+                  <div className="font-medium text-orange-800 flex items-center gap-2">
+                    <Flame className="w-4 h-4" />
+                    Heat Map Active:
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-16 h-4 rounded"
+                      style={{
+                        background:
+                          "linear-gradient(to right, #fbbf24, #fb923c, #f87171, #dc2626, #991b1b)",
+                      }}
+                    ></div>
+                    <span className="text-xs">
+                      Low → Medium → High → Critical
+                    </span>
+                  </div>
+                  <span className="text-xs text-orange-700">
+                    (Shows disease concentration density)
+                  </span>
+                </div>
+              )}
+
               <div className="flex items-center gap-6 text-sm">
                 <div className="font-medium text-gray-700">
                   Case Type Colors:
@@ -1061,10 +1304,17 @@ function InteractiveMap() {
             center={[9.082, 8.6753]}
             zoom={6}
             minZoom={5}
-            maxZoom={15}
+            maxZoom={18}
+            scrollWheelZoom={false}
             style={{ height: "100%", width: "100%" }}
             ref={mapRef}
           >
+            {/* Zoom handler to track zoom level changes */}
+            <ZoomHandler />
+
+            {/* Heat Map Layer - Shows when heat map is enabled */}
+            {showHeatMap && <HeatMapLayer data={filteredData} />}
+
             <LayersControl position="topright">
               {/* Base Layers */}
               <LayersControl.BaseLayer name="OpenStreetMap" checked>
@@ -1096,249 +1346,258 @@ function InteractiveMap() {
               {/* Human Cases Layer */}
               <LayersControl.Overlay name="Human Health Cases" checked>
                 <LayerGroup>
-                  {filteredData
-                    .filter(
-                      (item) =>
-                        item.type === "human" &&
-                        visibleLayers.human &&
-                        item.lat != null &&
-                        item.lon != null
-                    )
-                    .map((caseData) => (
-                      <Marker
-                        key={caseData.id}
-                        position={[caseData.lat, caseData.lon]}
-                        icon={createCaseIcon(caseData.type, caseData.severity)}
-                      >
-                        <Popup maxWidth={350}>
-                          <div className="p-3">
-                            <h3 className="font-bold text-lg mb-2 text-red-800">
-                              <Users className="w-5 h-5 inline mr-2" />
-                              {caseData.name}
-                            </h3>
-                            <div className="space-y-2 text-sm">
-                              <div>
-                                <strong>Disease:</strong> {caseData.disease}
-                              </div>
-                              <div>
-                                <strong>Cases:</strong>{" "}
-                                {caseData.cases.toLocaleString()}
-                              </div>
-                              <div>
-                                <strong>Severity:</strong>
-                                <span
-                                  className={`ml-1 px-2 py-1 rounded text-xs font-bold ${
-                                    caseData.severity === "critical"
-                                      ? "bg-red-100 text-red-800"
-                                      : caseData.severity === "high"
-                                      ? "bg-orange-100 text-orange-800"
-                                      : caseData.severity === "medium"
-                                      ? "bg-yellow-100 text-yellow-800"
-                                      : "bg-green-100 text-green-800"
-                                  }`}
-                                >
-                                  {caseData.severity.toUpperCase()}
-                                </span>
-                              </div>
-                              <div>
-                                <strong>Status:</strong>
-                                <span className="ml-1 px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
-                                  {caseData.status.toUpperCase()}
-                                </span>
-                              </div>
-                              <div>
-                                <strong>Reported:</strong>{" "}
-                                {caseData.reportedDate}
-                              </div>
-                              <div className="text-gray-500">
-                                <strong>Coordinates:</strong>{" "}
-                                {caseData.lat?.toFixed(4) ?? "N/A"},{" "}
-                                {caseData.lon?.toFixed(4) ?? "N/A"}
+                  {!showHeatMap &&
+                    filteredData
+                      .filter(
+                        (item) =>
+                          item.type === "human" &&
+                          visibleLayers.human &&
+                          item.lat != null &&
+                          item.lon != null
+                      )
+                      .map((caseData) => (
+                        <Marker
+                          key={caseData.id}
+                          position={[caseData.lat, caseData.lon]}
+                          icon={createCaseIcon(
+                            caseData.type,
+                            caseData.severity
+                          )}
+                        >
+                          <Popup maxWidth={350}>
+                            <div className="p-3">
+                              <h3 className="font-bold text-lg mb-2 text-red-800">
+                                <Users className="w-5 h-5 inline mr-2" />
+                                {caseData.name}
+                              </h3>
+                              <div className="space-y-2 text-sm">
+                                <div>
+                                  <strong>Disease:</strong> {caseData.disease}
+                                </div>
+                                <div>
+                                  <strong>Cases:</strong>{" "}
+                                  {caseData.cases.toLocaleString()}
+                                </div>
+                                <div>
+                                  <strong>Severity:</strong>
+                                  <span
+                                    className={`ml-1 px-2 py-1 rounded text-xs font-bold ${
+                                      caseData.severity === "critical"
+                                        ? "bg-red-100 text-red-800"
+                                        : caseData.severity === "high"
+                                        ? "bg-orange-100 text-orange-800"
+                                        : caseData.severity === "medium"
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : "bg-green-100 text-green-800"
+                                    }`}
+                                  >
+                                    {caseData.severity.toUpperCase()}
+                                  </span>
+                                </div>
+                                <div>
+                                  <strong>Status:</strong>
+                                  <span className="ml-1 px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                                    {caseData.status.toUpperCase()}
+                                  </span>
+                                </div>
+                                <div>
+                                  <strong>Reported:</strong>{" "}
+                                  {caseData.reportedDate}
+                                </div>
+                                <div className="text-gray-500">
+                                  <strong>Coordinates:</strong>{" "}
+                                  {caseData.lat?.toFixed(4) ?? "N/A"},{" "}
+                                  {caseData.lon?.toFixed(4) ?? "N/A"}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </Popup>
-                      </Marker>
-                    ))}
+                          </Popup>
+                        </Marker>
+                      ))}
                 </LayerGroup>
               </LayersControl.Overlay>
 
               {/* Animal Cases Layer */}
               <LayersControl.Overlay name="Animal Health Cases" checked>
                 <LayerGroup>
-                  {filteredData
-                    .filter(
-                      (item) =>
-                        item.type === "animal" &&
-                        visibleLayers.animal &&
-                        item.lat != null &&
-                        item.lon != null
-                    )
-                    .map((caseData) => (
-                      <Marker
-                        key={caseData.id}
-                        position={[caseData.lat, caseData.lon]}
-                        icon={createCaseIcon(caseData.type, caseData.severity)}
-                      >
-                        <Popup maxWidth={350}>
-                          <div className="p-3">
-                            <h3 className="font-bold text-lg mb-2 text-green-800">
-                              <PawPrint className="w-5 h-5 inline mr-2" />
-                              {caseData.name}
-                            </h3>
-                            <div className="space-y-2 text-sm">
-                              <div>
-                                <strong>Disease:</strong> {caseData.disease}
-                              </div>
-                              <div>
-                                <strong>Species:</strong> {caseData.species}
-                              </div>
-                              <div>
-                                <strong>Affected Animals:</strong>{" "}
-                                {caseData.cases.toLocaleString()}
-                              </div>
-                              <div>
-                                <strong>Farm Owner:</strong>{" "}
-                                {caseData.farmOwner}
-                              </div>
-                              <div>
-                                <strong>Severity:</strong>
-                                <span
-                                  className={`ml-1 px-2 py-1 rounded text-xs font-bold ${
-                                    caseData.severity === "critical"
-                                      ? "bg-red-100 text-red-800"
-                                      : caseData.severity === "high"
-                                      ? "bg-orange-100 text-orange-800"
-                                      : caseData.severity === "medium"
-                                      ? "bg-yellow-100 text-yellow-800"
-                                      : "bg-green-100 text-green-800"
-                                  }`}
-                                >
-                                  {caseData.severity.toUpperCase()}
-                                </span>
-                              </div>
-                              <div>
-                                <strong>Status:</strong>
-                                <span className="ml-1 px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
-                                  {caseData.status.toUpperCase()}
-                                </span>
-                              </div>
-                              <div>
-                                <strong>Reported:</strong>{" "}
-                                {caseData.reportedDate}
-                              </div>
-                              <div className="text-gray-500">
-                                <strong>Coordinates:</strong>{" "}
-                                {caseData.lat?.toFixed(4) ?? "N/A"},{" "}
-                                {caseData.lon?.toFixed(4) ?? "N/A"}
+                  {!showHeatMap &&
+                    filteredData
+                      .filter(
+                        (item) =>
+                          item.type === "animal" &&
+                          visibleLayers.animal &&
+                          item.lat != null &&
+                          item.lon != null
+                      )
+                      .map((caseData) => (
+                        <Marker
+                          key={caseData.id}
+                          position={[caseData.lat, caseData.lon]}
+                          icon={createCaseIcon(
+                            caseData.type,
+                            caseData.severity
+                          )}
+                        >
+                          <Popup maxWidth={350}>
+                            <div className="p-3">
+                              <h3 className="font-bold text-lg mb-2 text-green-800">
+                                <PawPrint className="w-5 h-5 inline mr-2" />
+                                {caseData.name}
+                              </h3>
+                              <div className="space-y-2 text-sm">
+                                <div>
+                                  <strong>Disease:</strong> {caseData.disease}
+                                </div>
+                                <div>
+                                  <strong>Species:</strong> {caseData.species}
+                                </div>
+                                <div>
+                                  <strong>Affected Animals:</strong>{" "}
+                                  {caseData.cases.toLocaleString()}
+                                </div>
+                                <div>
+                                  <strong>Farm Owner:</strong>{" "}
+                                  {caseData.farmOwner}
+                                </div>
+                                <div>
+                                  <strong>Severity:</strong>
+                                  <span
+                                    className={`ml-1 px-2 py-1 rounded text-xs font-bold ${
+                                      caseData.severity === "critical"
+                                        ? "bg-red-100 text-red-800"
+                                        : caseData.severity === "high"
+                                        ? "bg-orange-100 text-orange-800"
+                                        : caseData.severity === "medium"
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : "bg-green-100 text-green-800"
+                                    }`}
+                                  >
+                                    {caseData.severity.toUpperCase()}
+                                  </span>
+                                </div>
+                                <div>
+                                  <strong>Status:</strong>
+                                  <span className="ml-1 px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                                    {caseData.status.toUpperCase()}
+                                  </span>
+                                </div>
+                                <div>
+                                  <strong>Reported:</strong>{" "}
+                                  {caseData.reportedDate}
+                                </div>
+                                <div className="text-gray-500">
+                                  <strong>Coordinates:</strong>{" "}
+                                  {caseData.lat?.toFixed(4) ?? "N/A"},{" "}
+                                  {caseData.lon?.toFixed(4) ?? "N/A"}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </Popup>
-                      </Marker>
-                    ))}
+                          </Popup>
+                        </Marker>
+                      ))}
                 </LayerGroup>
               </LayersControl.Overlay>
 
               {/* Environmental Cases Layer with Impact Circles */}
               <LayersControl.Overlay name="Environmental Cases" checked>
                 <LayerGroup>
-                  {filteredData
-                    .filter(
-                      (item) =>
-                        item.type === "environmental" &&
-                        visibleLayers.environmental &&
-                        item.lat != null &&
-                        item.lon != null
-                    )
-                    .map((caseData) => {
-                      const circleProps = createImpactCircle(caseData);
-                      return (
-                        <React.Fragment key={caseData.id}>
-                          {/* Impact Radius Circle */}
-                          <Circle
-                            center={circleProps.center}
-                            radius={circleProps.radius}
-                            pathOptions={circleProps.pathOptions}
-                          >
-                            <Tooltip>
-                              Impact Radius:{" "}
-                              {(circleProps.radius / 1000).toFixed(1)} km
-                            </Tooltip>
-                          </Circle>
+                  {!showHeatMap &&
+                    filteredData
+                      .filter(
+                        (item) =>
+                          item.type === "environmental" &&
+                          visibleLayers.environmental &&
+                          item.lat != null &&
+                          item.lon != null
+                      )
+                      .map((caseData) => {
+                        const circleProps = createImpactCircle(caseData);
+                        return (
+                          <React.Fragment key={caseData.id}>
+                            {/* Impact Radius Circle */}
+                            <Circle
+                              center={circleProps.center}
+                              radius={circleProps.radius}
+                              pathOptions={circleProps.pathOptions}
+                            >
+                              <Tooltip>
+                                Impact Radius:{" "}
+                                {(circleProps.radius / 1000).toFixed(1)} km
+                              </Tooltip>
+                            </Circle>
 
-                          {/* Marker */}
-                          <Marker
-                            position={[caseData.lat, caseData.lon]}
-                            icon={createCaseIcon(
-                              caseData.type,
-                              caseData.severity
-                            )}
-                          >
-                            <Popup maxWidth={350}>
-                              <div className="p-3">
-                                <h3 className="font-bold text-lg mb-2 text-purple-800">
-                                  <Leaf className="w-5 h-5 inline mr-2" />
-                                  {caseData.name}
-                                </h3>
-                                <div className="space-y-2 text-sm">
-                                  <div>
-                                    <strong>Incident Type:</strong>{" "}
-                                    {caseData.incidentType}
-                                  </div>
-                                  <div>
-                                    <strong>Contaminant:</strong>{" "}
-                                    {caseData.contaminant}
-                                  </div>
-                                  <div>
-                                    <strong>Affected Population:</strong>{" "}
-                                    {caseData.cases.toLocaleString()}
-                                  </div>
-                                  <div>
-                                    <strong>Impact Radius:</strong>{" "}
-                                    {(caseData.affectedRadius / 1000).toFixed(
-                                      1
-                                    )}{" "}
-                                    km
-                                  </div>
-                                  <div>
-                                    <strong>Severity:</strong>
-                                    <span
-                                      className={`ml-1 px-2 py-1 rounded text-xs font-bold ${
-                                        caseData.severity === "critical"
-                                          ? "bg-red-100 text-red-800"
-                                          : caseData.severity === "high"
-                                          ? "bg-orange-100 text-orange-800"
-                                          : caseData.severity === "medium"
-                                          ? "bg-yellow-100 text-yellow-800"
-                                          : "bg-green-100 text-green-800"
-                                      }`}
-                                    >
-                                      {caseData.severity.toUpperCase()}
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <strong>Status:</strong>
-                                    <span className="ml-1 px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
-                                      {caseData.status.toUpperCase()}
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <strong>Reported:</strong>{" "}
-                                    {caseData.reportedDate}
-                                  </div>
-                                  <div className="text-gray-500">
-                                    <strong>Coordinates:</strong>{" "}
-                                    {caseData.lat?.toFixed(4) ?? "N/A"},{" "}
-                                    {caseData.lon?.toFixed(4) ?? "N/A"}
+                            {/* Marker */}
+                            <Marker
+                              position={[caseData.lat, caseData.lon]}
+                              icon={createCaseIcon(
+                                caseData.type,
+                                caseData.severity
+                              )}
+                            >
+                              <Popup maxWidth={350}>
+                                <div className="p-3">
+                                  <h3 className="font-bold text-lg mb-2 text-purple-800">
+                                    <Leaf className="w-5 h-5 inline mr-2" />
+                                    {caseData.name}
+                                  </h3>
+                                  <div className="space-y-2 text-sm">
+                                    <div>
+                                      <strong>Incident Type:</strong>{" "}
+                                      {caseData.incidentType}
+                                    </div>
+                                    <div>
+                                      <strong>Contaminant:</strong>{" "}
+                                      {caseData.contaminant}
+                                    </div>
+                                    <div>
+                                      <strong>Affected Population:</strong>{" "}
+                                      {caseData.cases.toLocaleString()}
+                                    </div>
+                                    <div>
+                                      <strong>Impact Radius:</strong>{" "}
+                                      {(caseData.affectedRadius / 1000).toFixed(
+                                        1
+                                      )}{" "}
+                                      km
+                                    </div>
+                                    <div>
+                                      <strong>Severity:</strong>
+                                      <span
+                                        className={`ml-1 px-2 py-1 rounded text-xs font-bold ${
+                                          caseData.severity === "critical"
+                                            ? "bg-red-100 text-red-800"
+                                            : caseData.severity === "high"
+                                            ? "bg-orange-100 text-orange-800"
+                                            : caseData.severity === "medium"
+                                            ? "bg-yellow-100 text-yellow-800"
+                                            : "bg-green-100 text-green-800"
+                                        }`}
+                                      >
+                                        {caseData.severity.toUpperCase()}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <strong>Status:</strong>
+                                      <span className="ml-1 px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                                        {caseData.status.toUpperCase()}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <strong>Reported:</strong>{" "}
+                                      {caseData.reportedDate}
+                                    </div>
+                                    <div className="text-gray-500">
+                                      <strong>Coordinates:</strong>{" "}
+                                      {caseData.lat?.toFixed(4) ?? "N/A"},{" "}
+                                      {caseData.lon?.toFixed(4) ?? "N/A"}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            </Popup>
-                          </Marker>
-                        </React.Fragment>
-                      );
-                    })}
+                              </Popup>
+                            </Marker>
+                          </React.Fragment>
+                        );
+                      })}
                 </LayerGroup>
               </LayersControl.Overlay>
             </LayersControl>
