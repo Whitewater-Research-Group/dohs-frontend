@@ -612,7 +612,12 @@ function InteractiveMap() {
 
   const onEachFeature = (feature, layer) => {
     const { state, cases, id } = feature.properties;
-    layer.bindPopup(`<strong>${state}</strong><br>Cases: ${cases}`);
+
+    // Only bind popup if state is defined
+    if (state && state !== "undefined") {
+      layer.bindPopup(`<strong>${state}</strong><br>Cases: ${cases || 0}`);
+    }
+
     layer.on("mouseover", () => {
       layer.setStyle({
         fillOpacity: 0.7,
@@ -996,322 +1001,459 @@ function InteractiveMap() {
       <div className="flex flex-col h-full">
         {/* Enhanced Control Panel */}
         {showControls && (
-          <div className="bg-white shadow-lg border-b border-gray-200 p-4 z-10">
+          <div className="bg-gray-50 shadow-lg border-b border-gray-200 p-4 z-10">
+            {/* Header Section */}
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-600 p-2.5 rounded-lg shadow-md">
+                  <BarChart3 className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-gray-800">
+                    GIS Dashboard Control Panel
+                  </h2>
+                  <p className="text-xs text-gray-600">
+                    Real-time One Health Surveillance Monitoring
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowControls(false)}
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all shadow-sm hover:shadow"
+              >
+                <EyeOff className="w-4 h-4" />
+                Hide Panel
+              </button>
+            </div>
+
             {/* Statistics Dashboard */}
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-              <div className="flex gap-4">
-                <div className="bg-blue-50 px-4 py-2 rounded-lg">
-                  <div className="text-sm text-blue-600 font-medium">
+            <div className="grid grid-cols-6 gap-3 mb-4">
+              <div className="bg-blue-600 px-4 py-3 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-xs text-blue-100 font-semibold uppercase tracking-wide">
                     Total Cases
                   </div>
-                  <div className="text-xl font-bold text-blue-800">
-                    {stats.total}
-                  </div>
-                  <div className="text-xs text-blue-500 mt-1">
-                    {humanCasesData.length > 0 ? "Live Data" : "No Data"}
-                  </div>
+                  <BarChart3 className="w-4 h-4 text-blue-200" />
                 </div>
-                <div className="bg-red-50 px-4 py-2 rounded-lg flex items-center gap-2">
-                  <Users className="w-4 h-4 text-red-600" />
-                  <div>
-                    <div className="text-sm text-red-600 font-medium">
-                      Human
-                    </div>
-                    <div className="text-xl font-bold text-red-800">
-                      {stats.human}
-                    </div>
-                  </div>
+                <div className="text-2xl font-bold text-white">
+                  {stats.total}
                 </div>
-                <div className="bg-green-50 px-4 py-2 rounded-lg flex items-center gap-2">
-                  <PawPrint className="w-4 h-4 text-green-600" />
-                  <div>
-                    <div className="text-sm text-green-600 font-medium">
-                      Animal
-                    </div>
-                    <div className="text-xl font-bold text-green-800">
-                      {stats.animal}
-                    </div>
-                  </div>
+                <div className="text-xs text-blue-100 mt-1 flex items-center gap-1">
+                  <div className={`w-2 h-2 rounded-full ${humanCasesData.length > 0 ? 'bg-green-300 animate-pulse' : 'bg-gray-300'}`}></div>
+                  {humanCasesData.length > 0 ? "Live Data" : "No Data"}
                 </div>
-                <div className="bg-purple-50 px-4 py-2 rounded-lg flex items-center gap-2">
-                  <Leaf className="w-4 h-4 text-purple-600" />
-                  <div>
-                    <div className="text-sm text-purple-600 font-medium">
-                      Environmental
-                    </div>
-                    <div className="text-xl font-bold text-purple-800">
-                      {stats.environmental}
-                    </div>
+              </div>
+              
+              <div className="bg-white border border-gray-200 px-4 py-3 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
+                    Human
                   </div>
+                  <Users className="w-4 h-4 text-gray-400" />
                 </div>
-                <div className="bg-red-100 px-4 py-2 rounded-lg">
-                  <div className="text-sm text-red-700 font-medium">
+                <div className="text-2xl font-bold text-gray-800">
+                  {stats.human}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  Health Cases
+                </div>
+              </div>
+              
+              <div className="bg-white border border-gray-200 px-4 py-3 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
+                    Animal
+                  </div>
+                  <PawPrint className="w-4 h-4 text-gray-400" />
+                </div>
+                <div className="text-2xl font-bold text-gray-800">
+                  {stats.animal}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  Veterinary Cases
+                </div>
+              </div>
+              
+              <div className="bg-white border border-gray-200 px-4 py-3 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wide">
+                    Environmental
+                  </div>
+                  <Leaf className="w-4 h-4 text-gray-400" />
+                </div>
+                <div className="text-2xl font-bold text-gray-800">
+                  {stats.environmental}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  Eco-Health Cases
+                </div>
+              </div>
+              
+              <div className="bg-orange-500 px-4 py-3 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-xs text-orange-100 font-semibold uppercase tracking-wide">
                     Critical
                   </div>
-                  <div className="text-xl font-bold text-red-900">
-                    {stats.critical}
-                  </div>
+                  <AlertTriangle className="w-4 h-4 text-orange-100" />
+                </div>
+                <div className="text-2xl font-bold text-white">
+                  {stats.critical}
+                </div>
+                <div className="text-xs text-orange-100 mt-1">
+                  High Priority
                 </div>
               </div>
 
+              <div className="bg-gray-700 px-4 py-3 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-xs text-gray-300 font-semibold uppercase tracking-wide">
+                    Zoom Level
+                  </div>
+                  <MapPin className="w-4 h-4 text-gray-300" />
+                </div>
+                <div className="text-2xl font-bold text-white">
+                  {mapZoom}
+                </div>
+                <div className="text-xs text-gray-300 mt-1">
+                  Max: 18
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Controls Row */}
+            <div className="flex items-center justify-between gap-3 mb-4 bg-white p-3 rounded-lg shadow-sm border border-gray-200">
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowHeatMap(!showHeatMap)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-medium shadow-sm hover:shadow ${
                     showHeatMap
-                      ? "bg-orange-100 text-orange-700 hover:bg-orange-200"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? "bg-orange-500 text-white"
+                      : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
                   }`}
-                  title={showHeatMap ? "Heat Map: ON" : "Heat Map: OFF"}
+                  title={showHeatMap ? "Disable Heat Map" : "Enable Heat Map"}
                 >
                   <Flame className="w-4 h-4" />
-                  {showHeatMap ? "Heat Map: ON" : "Heat Map: OFF"}
+                  Heat Map: {showHeatMap ? "ON" : "OFF"}
                 </button>
                 <button
                   onClick={() =>
                     setScrollWheelZoomEnabled(!scrollWheelZoomEnabled)
                   }
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all font-medium shadow-sm hover:shadow ${
                     scrollWheelZoomEnabled
-                      ? "bg-green-100 text-green-700 hover:bg-green-200"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? "bg-green-500 text-white"
+                      : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
                   }`}
                   title={
                     scrollWheelZoomEnabled
-                      ? "Scroll Zoom: ON"
-                      : "Scroll Zoom: OFF"
+                      ? "Disable Scroll Zoom"
+                      : "Enable Scroll Zoom"
                   }
                 >
                   <BarChart3 className="w-4 h-4" />
-                  {scrollWheelZoomEnabled
-                    ? "Scroll Zoom: ON"
-                    : "Scroll Zoom: OFF"}
+                  Scroll Zoom: {scrollWheelZoomEnabled ? "ON" : "OFF"}
                 </button>
+              </div>
+
+              <div className="flex gap-2">
                 <button
                   onClick={refreshAllData}
-                  className="flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-sm hover:shadow font-medium"
                   title="Refresh All Cases Data"
                   disabled={isLoading}
                 >
                   <RefreshCw
                     className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`}
                   />
-                  Refresh Data
-                </button>
-                <button
-                  onClick={() => setShowControls(false)}
-                  className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  <EyeOff className="w-4 h-4" />
-                  Hide Panel
+                  {isLoading ? "Refreshing..." : "Refresh Data"}
                 </button>
               </div>
             </div>
 
             {/* Filters and Search */}
-            <div className="flex flex-wrap items-center gap-4 mb-4">
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search cases, diseases, contaminants..."
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-80"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+            <div className="bg-white p-3 rounded-lg shadow-sm mb-4 border border-gray-200">
+              <div className="flex items-center gap-2 mb-3">
+                <Filter className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-semibold text-gray-700">
+                  Filters & Search
+                </span>
+                {(activeFilters.caseType !== 'all' || activeFilters.severity !== 'all' || activeFilters.status !== 'all' || searchTerm) && (
+                  <span className="ml-2 px-2 py-0.5 bg-blue-500 text-white text-xs font-bold rounded-full">
+                    Active
+                  </span>
+                )}
               </div>
+              
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative flex-1 min-w-[300px]">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by disease, location, case ID, symptoms..."
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm("")}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
 
-              <select
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={activeFilters.caseType}
-                onChange={(e) =>
-                  setActiveFilters((prev) => ({
-                    ...prev,
-                    caseType: e.target.value,
-                  }))
-                }
-              >
-                <option value="all">All Case Types</option>
-                <option value="human">Human Cases</option>
-                <option value="animal">Animal Cases</option>
-                <option value="environmental">Environmental Cases</option>
-              </select>
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-gray-500" />
+                  <select
+                    className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm font-medium"
+                    value={activeFilters.caseType}
+                    onChange={(e) =>
+                      setActiveFilters((prev) => ({
+                        ...prev,
+                        caseType: e.target.value,
+                      }))
+                    }
+                  >
+                    <option value="all">📊 All Types</option>
+                    <option value="human">👥 Human Cases</option>
+                    <option value="animal">🐾 Animal Cases</option>
+                    <option value="environmental">🌿 Environmental</option>
+                  </select>
 
-              <select
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={activeFilters.severity}
-                onChange={(e) =>
-                  setActiveFilters((prev) => ({
-                    ...prev,
-                    severity: e.target.value,
-                  }))
-                }
-              >
-                <option value="all">All Severities</option>
-                <option value="critical">Critical</option>
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
-              </select>
+                  <select
+                    className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm font-medium"
+                    value={activeFilters.severity}
+                    onChange={(e) =>
+                      setActiveFilters((prev) => ({
+                        ...prev,
+                        severity: e.target.value,
+                      }))
+                    }
+                  >
+                    <option value="all">⚡ All Severities</option>
+                    <option value="critical">🔴 Critical</option>
+                    <option value="high">🟠 High</option>
+                    <option value="medium">🟡 Medium</option>
+                    <option value="low">🟢 Low</option>
+                  </select>
 
-              <select
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={activeFilters.status}
-                onChange={(e) =>
-                  setActiveFilters((prev) => ({
-                    ...prev,
-                    status: e.target.value,
-                  }))
-                }
-              >
-                <option value="all">All Statuses</option>
-                <option value="active">Active</option>
-                <option value="contained">Contained</option>
-                <option value="monitoring">Monitoring</option>
-                <option value="quarantined">Quarantined</option>
-                <option value="remediation">Remediation</option>
-              </select>
+                  <select
+                    className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm font-medium"
+                    value={activeFilters.status}
+                    onChange={(e) =>
+                      setActiveFilters((prev) => ({
+                        ...prev,
+                        status: e.target.value,
+                      }))
+                    }
+                  >
+                    <option value="all">📋 All Statuses</option>
+                    <option value="active">🔥 Active</option>
+                    <option value="contained">✅ Contained</option>
+                    <option value="monitoring">👁️ Monitoring</option>
+                    <option value="quarantined">🔒 Quarantined</option>
+                    <option value="remediation">🔧 Remediation</option>
+                  </select>
 
-              <button
-                onClick={() => {
-                  setActiveFilters({
-                    caseType: "all",
-                    severity: "all",
-                    status: "all",
-                  });
-                  setSearchTerm("");
-                }}
-                className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                <RefreshCw className="w-4 h-4" />
-                Reset
-              </button>
+                  <button
+                    onClick={() => {
+                      setActiveFilters({
+                        caseType: "all",
+                        severity: "all",
+                        status: "all",
+                      });
+                      setSearchTerm("");
+                    }}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all shadow-sm font-medium"
+                    title="Clear all filters"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Clear
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Layer Visibility Controls */}
-            <div className="flex items-center gap-4">
-              <span className="text-sm font-medium text-gray-700">
-                Visible Layers:
-              </span>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={visibleLayers.human}
-                  onChange={(e) =>
-                    setVisibleLayers((prev) => ({
-                      ...prev,
-                      human: e.target.checked,
-                    }))
-                  }
-                  className="rounded"
-                />
-                <Users className="w-4 h-4 text-red-600" />
-                <span className="text-sm">Human Cases</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={visibleLayers.animal}
-                  onChange={(e) =>
-                    setVisibleLayers((prev) => ({
-                      ...prev,
-                      animal: e.target.checked,
-                    }))
-                  }
-                  className="rounded"
-                />
-                <PawPrint className="w-4 h-4 text-green-600" />
-                <span className="text-sm">Animal Cases</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={visibleLayers.environmental}
-                  onChange={(e) =>
-                    setVisibleLayers((prev) => ({
-                      ...prev,
-                      environmental: e.target.checked,
-                    }))
-                  }
-                  className="rounded"
-                />
-                <Leaf className="w-4 h-4 text-purple-600" />
-                <span className="text-sm">Environmental Cases</span>
-              </label>
+            <div className="bg-white p-3 rounded-lg shadow-sm mb-4 border border-gray-200">
+              <div className="flex items-center gap-2 mb-3">
+                <Eye className="w-4 h-4 text-gray-600" />
+                <span className="text-sm font-semibold text-gray-700">
+                  Layer Visibility
+                </span>
+              </div>
+              <div className="flex items-center gap-6">
+                <label className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={visibleLayers.human}
+                    onChange={(e) =>
+                      setVisibleLayers((prev) => ({
+                        ...prev,
+                        human: e.target.checked,
+                      }))
+                    }
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                  />
+                  <div className="flex items-center gap-2">
+                    <div className="bg-blue-100 p-1.5 rounded">
+                      <Users className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">Human Cases</span>
+                    <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-bold">
+                      {stats.human}
+                    </span>
+                  </div>
+                </label>
+                
+                <label className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={visibleLayers.animal}
+                    onChange={(e) =>
+                      setVisibleLayers((prev) => ({
+                        ...prev,
+                        animal: e.target.checked,
+                      }))
+                    }
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                  />
+                  <div className="flex items-center gap-2">
+                    <div className="bg-gray-100 p-1.5 rounded">
+                      <PawPrint className="w-4 h-4 text-gray-600" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">Animal Cases</span>
+                    <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-bold">
+                      {stats.animal}
+                    </span>
+                  </div>
+                </label>
+                
+                <label className="flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={visibleLayers.environmental}
+                    onChange={(e) =>
+                      setVisibleLayers((prev) => ({
+                        ...prev,
+                        environmental: e.target.checked,
+                      }))
+                    }
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                  />
+                  <div className="flex items-center gap-2">
+                    <div className="bg-purple-100 p-1.5 rounded">
+                      <Leaf className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">Environmental</span>
+                    <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-bold">
+                      {stats.environmental}
+                    </span>
+                  </div>
+                </label>
+              </div>
             </div>
 
             {/* Enhanced Legend */}
-            <div className="mt-4 border-t pt-3 space-y-3">
+            <div className="grid grid-cols-2 gap-3">
               {showHeatMap && (
-                <div className="flex items-center gap-6 text-sm bg-orange-50 p-2 rounded-lg border border-orange-200">
-                  <div className="font-medium text-orange-800 flex items-center gap-2">
-                    <Flame className="w-4 h-4" />
-                    Heat Map Active:
+                <div className="col-span-2 bg-orange-50 p-4 rounded-lg border border-orange-200 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-orange-500 p-2 rounded-lg">
+                        <Flame className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-orange-900 text-sm">Heat Map Active</div>
+                        <div className="text-xs text-orange-700">Disease concentration density visualization</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-32 h-6 rounded-lg shadow-inner border border-orange-300"
+                        style={{
+                          background:
+                            "linear-gradient(to right, #fbbf24, #fb923c, #f87171, #dc2626, #991b1b)",
+                        }}
+                      ></div>
+                      <div className="text-xs font-medium text-orange-800">
+                        Low → Critical
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-16 h-4 rounded"
-                      style={{
-                        background:
-                          "linear-gradient(to right, #fbbf24, #fb923c, #f87171, #dc2626, #991b1b)",
-                      }}
-                    ></div>
-                    <span className="text-xs">
-                      Low → Medium → High → Critical
-                    </span>
-                  </div>
-                  <span className="text-xs text-orange-700">
-                    (Shows disease concentration density)
-                  </span>
                 </div>
               )}
 
-              <div className="flex items-center gap-6 text-sm">
-                <div className="font-medium text-gray-700">
-                  Case Type Colors:
+              <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                <div className="font-semibold text-gray-800 mb-3 text-sm flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4" />
+                  Severity Scale
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
-                  <Users className="w-4 h-4 text-blue-600" />
-                  <span>Human Cases</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-                  <PawPrint className="w-4 h-4 text-green-600" />
-                  <span>Animal Cases</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-purple-500 rounded-full"></div>
-                  <Leaf className="w-4 h-4 text-purple-600" />
-                  <span>Environmental Cases</span>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-red-600 rounded-lg shadow-md flex items-center justify-center">
+                      <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">Critical</span>
+                    <span className="text-xs text-gray-500">(40px)</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-7 h-7 bg-orange-500 rounded-lg shadow-md flex items-center justify-center">
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">High</span>
+                    <span className="text-xs text-gray-500">(36px)</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 bg-orange-400 rounded-lg shadow-md flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">Medium</span>
+                    <span className="text-xs text-gray-500">(32px)</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 bg-yellow-400 rounded-lg shadow-md flex items-center justify-center">
+                      <div className="w-1 h-1 bg-amber-900 rounded-full"></div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">Low</span>
+                    <span className="text-xs text-gray-500">(28px)</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-6 text-sm">
-                <div className="font-medium text-gray-700">
-                  Severity Indicators:
+              <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                <div className="font-semibold text-gray-800 mb-3 text-sm flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  Case Type Markers
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 border-2 border-gray-400 rounded flex items-center justify-center">
-                    <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-blue-600 rounded-lg shadow-md flex items-center justify-center">
+                      <Users className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">Human Health</span>
                   </div>
-                  <span>Critical (Large)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-gray-400 rounded flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 bg-gray-600 rounded-full"></div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gray-500 rounded-lg shadow-md flex items-center justify-center">
+                      <PawPrint className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">Animal Health</span>
                   </div>
-                  <span>High (Medium)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 border-2 border-gray-400 rounded flex items-center justify-center">
-                    <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-purple-500 rounded-lg shadow-md flex items-center justify-center">
+                      <Leaf className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">Environmental</span>
                   </div>
-                  <span>Medium (Standard)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 border-2 border-gray-400 rounded"></div>
-                  <span>Low (Small)</span>
+                  <div className="flex items-center gap-3 mt-3 pt-3 border-t border-gray-200">
+                    <div className="relative">
+                      <div className="w-8 h-8 bg-orange-500 rounded-lg shadow-md animate-pulse"></div>
+                      <div className="absolute inset-0 bg-yellow-300 rounded-lg opacity-50 animate-ping"></div>
+                    </div>
+                    <span className="text-sm font-medium text-orange-700">New Alert (Pulsing)</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1322,10 +1464,10 @@ function InteractiveMap() {
         {!showControls && (
           <button
             onClick={() => setShowControls(true)}
-            className="absolute top-4 left-4 z-[1000] flex items-center gap-2 px-3 py-2 bg-white shadow-lg rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+            className="absolute top-4 left-4 z-[1000] flex items-center gap-2 px-4 py-3 bg-blue-600 text-white shadow-xl rounded-lg hover:bg-blue-700 transition-all transform hover:scale-105 font-semibold"
           >
-            <Eye className="w-4 h-4" />
-            Show Controls
+            <Eye className="w-5 h-5" />
+            Show Control Panel
           </button>
         )}
 
@@ -1377,6 +1519,11 @@ function InteractiveMap() {
                   data={nigeriaGeoJson}
                   style={stateStyle}
                   onEachFeature={onEachFeature}
+                  filter={(feature) => {
+                    // Only render features with valid state properties
+                    const state = feature.properties?.state;
+                    return state && state !== "undefined" && state !== "";
+                  }}
                 />
               </LayersControl.Overlay>
 
@@ -1836,7 +1983,6 @@ export default InteractiveMap;
 //   2) Add a legend to the map to explain the color coding of states
 //   3) Add a search functionality to find specific locations or states
 //   4) Add a button to reset the map view to the default state
-//   5) Add a button to toggle between different map layers (e.g., satellite, terrain)
 //   6) Add a button to download the map as an image or PDF
 //   7) Add a button to print the map
 //   8) Add a button to share the map on social media
