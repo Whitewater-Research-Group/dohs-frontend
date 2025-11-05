@@ -6,6 +6,7 @@ import Researcher_3 from '../assets/researcher_three.png';
 import Researcher_4 from '../assets/researcher_four.png';
 import Researcher_5 from '../assets/researcher_five.png';
 import Researcher_6 from '../assets/researcher_six.png';
+import Researcher_placeholder from '../assets/researcher.png';
 
 
 
@@ -57,7 +58,8 @@ const Team = () => {
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-6">
                         {teamMembers.researchers.map((member, index) => (
                             <div key={index} className="text-center">
-                                <img src={member.img} alt={member.name} className=" mb-2" />
+                                {/* <img src={member.img} alt={member.name} className=" mb-2" /> */}
+                                <img src={Researcher_placeholder} alt={member.name} className=" mb-2" />
                                 <h4 className="text-sm font-bold text-darkCoal">{member.name}</h4>
                                 <p className="text-darkCoal font-normal ">{member.title}</p>
                             </div>
@@ -70,7 +72,8 @@ const Team = () => {
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-8 gap-6">
                         {teamMembers.developers.map((member, index) => (
                             <div key={index} className="text-center">
-                                <img src={member.img} alt={member.name} className=" mb-2" />
+                                {/* <img src={member.img} alt={member.name} className=" mb-2" /> */}
+                                <img src={Researcher_placeholder} alt={member.name} className=" mb-2" />
                                 <h4 className="text-sm font-bold text-darkCoal">{member.name}</h4>
                                 <p className="text-darkCoal font-normal">{member.title}</p>
                             </div>

@@ -1,16 +1,8 @@
-import React from 'react'
-import Navbar from '../../components/Navbar'
-import Construction from '../../components/Construction'
-import Footer from '../../components/Footer'
+import React from "react";
+import Construction from "../../components/Construction";
 
-function Surveillance() {
-  return (
-    <div className=''>
-      <Navbar />
-      <Construction />
-      <Footer />
-    </div>
-  )
-}
+const Surveillance = () => {
+  return <Construction />;
+};
 
-export default Surveillance
+export default Surveillance;

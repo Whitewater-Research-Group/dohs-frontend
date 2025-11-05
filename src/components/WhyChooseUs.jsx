@@ -1,51 +1,116 @@
-// eslint-disable-next-line no-unused-vars
-import React from 'react';
-import Video from '../assets/video.png';
-import One from '../assets/one_icon.png';
-import Two from '../assets/two_icon.png';
-import Three from '../assets/three_icon.png';
+import React from "react";
+import { Shield, Users, Award, Clock, Globe, Zap } from "lucide-react";
 
-const WhyChooseUs = () => {
-    return (
-        <section className="py-20 bg-white w-full flex justify-center">
-            <div className="container text-center flex flex-col items-center">
-                <h3 className="text-2xl md:text-4xl font-bold text-center mb-8 text-darkCoal">Why you should choose us?</h3>
-                <p className="text-center text-lg font-normal text-darkCoal mb-10">Your health is our responsibility.</p>
+function WhyChooseUs() {
+  const reasons = [
+    {
+      icon: Shield,
+      title: "Comprehensive Protection",
+      description:
+        "Integrated One Health approach protecting humans, animals, and the environment.",
+      color: "blue",
+    },
+    {
+      icon: Users,
+      title: "Expert Team",
+      description:
+        "Multidisciplinary team of health professionals, veterinarians, and environmental scientists.",
+      color: "green",
+    },
+    {
+      icon: Award,
+      title: "Proven Excellence",
+      description:
+        "Track record of successful disease surveillance and rapid response interventions.",
+      color: "purple",
+    },
+    {
+      icon: Clock,
+      title: "Real-Time Monitoring",
+      description:
+        "24/7 surveillance system with immediate alerts for emerging health threats.",
+      color: "orange",
+    },
+    {
+      icon: Globe,
+      title: "Wide Coverage",
+      description:
+        "Extensive network covering all regions with local and national coordination.",
+      color: "indigo",
+    },
+    {
+      icon: Zap,
+      title: "Rapid Response",
+      description:
+        "Quick deployment and intervention capabilities for health emergencies.",
+      color: "red",
+    },
+  ];
 
-                <div className="flex justify-between flex-col md:flex-row gap-10 items-center mt-10 w-4/5">
+  const getColorClasses = (color) => {
+    const colors = {
+      blue: "bg-blue-50 text-blue-600 border-blue-200",
+      green: "bg-green-50 text-green-600 border-green-200",
+      purple: "bg-purple-50 text-purple-600 border-purple-200",
+      orange: "bg-orange-50 text-orange-600 border-orange-200",
+      indigo: "bg-indigo-50 text-indigo-600 border-indigo-200",
+      red: "bg-red-50 text-red-600 border-red-200",
+    };
+    return colors[color] || colors.blue;
+  };
 
-                    <img src={Video} alt="Why Choose Us" className="w-full md:w-1/2 rounded-md self-stretch" />
+  return (
+    <section className="w-full px-6 py-16 bg-gray-50">
+      <div className="max-w-7xl mx-auto">
+        {/* Section Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            Why Choose Our Platform?
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Discover the advantages of our integrated One Health surveillance
+            system designed to protect communities across Nigeria.
+          </p>
+        </div>
 
-                    <div className='flex flex-col gap-10'>
-                        <div className='flex space-x-6'>
-                            <img src={One} alt='' className='w-10 h-10' />
-                            <div className='text-start'>
-                                <h4 className='font-bold font-sans text-lg text-darkCoal'>Comprehensive Monitoring</h4>
-                                <p className='font-normal font-sans text-base text-darkCoal mt-1 leading-8'>Leverage advanced tools to track and analyze health data seamlessly.</p>
-                            </div>
-                        </div>
-
-                        <div className='flex space-x-6'>
-                            <img src={Two} alt='' className='w-10 h-10' />
-                            <div className='text-start'>
-                                <h4 className='font-bold font-sans text-lg text-darkCoal'>Expert Analysis</h4>
-                                <p className='font-normal font-sans text-base text-darkCoal mt-1 leading-8'>Gain insights from top health experts to make informed decisions.</p>
-                            </div>
-                        </div>
-
-                        <div className='flex space-x-6'>
-                            <img src={Three} alt='' className='w-10 h-10' />
-                            <div className='text-start'>
-                                <h4 className='font-bold font-sans text-lg text-darkCoal'>AI-driven Model</h4>
-                                <p className='font-normal font-sans text-base text-darkCoal mt-1 leading-8'>Utilize AI-driven technology to quickly identify and respond to health threats in real-time.</p>
-                            </div>
-                        </div>
-
-                    </div>
+        {/* Reasons Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {reasons.map((reason, index) => {
+            const Icon = reason.icon;
+            return (
+              <div
+                key={index}
+                className="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-200"
+              >
+                <div
+                  className={`inline-flex p-3 rounded-lg mb-4 border ${getColorClasses(
+                    reason.color
+                  )}`}
+                >
+                  <Icon className="w-6 h-6" />
                 </div>
-            </div>
-        </section>
-    )
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  {reason.title}
+                </h3>
+                <p className="text-gray-600">{reason.description}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Call to Action */}
+        <div className="mt-12 text-center">
+          <p className="text-gray-700 mb-6">
+            Join thousands of stakeholders already using our platform for
+            effective health surveillance.
+          </p>
+          <button className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg">
+            Get Started Today
+          </button>
+        </div>
+      </div>
+    </section>
+  );
 }
 
-export default WhyChooseUs
+export default WhyChooseUs;
